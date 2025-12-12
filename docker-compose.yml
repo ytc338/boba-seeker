@@ -1,0 +1,52 @@
+services:
+  backend:
+    build: ./backend
+    container_name: boba-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_PLACES_API_KEY=${GOOGLE_PLACES_API_KEY:-}
+    volumes:
+      - ./backend:/app
+      - backend_data:/app/data
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - VITE_MAPBOX_TOKEN=${VITE_MAPBOX_TOKEN:-}
+        - VITE_API_URL=
+    container_name: boba-frontend
+    ports:
+      - "3002:80"
+    depends_on:
+      - backend
+
+  # Development frontend (with hot reload)
+  frontend-dev:
+    image: node:20-alpine
+    container_name: boba-frontend-dev
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_MAPBOX_TOKEN=${VITE_MAPBOX_TOKEN:-}
+    profiles:
+      - dev
+
+volumes:
+  backend_data:
+  frontend_node_modules:
