@@ -14,19 +14,9 @@ export async function getShops(params?: {
   page_size?: number;
   country?: string;
   city?: string;
-  brand_ids?: number[];
+  brand_id?: number;
 }): Promise<ShopListResponse> {
-  // Build query params, handling brand_ids array specially
-  const queryParams = new URLSearchParams();
-  if (params?.page) queryParams.append('page', String(params.page));
-  if (params?.page_size) queryParams.append('page_size', String(params.page_size));
-  if (params?.country) queryParams.append('country', params.country);
-  if (params?.city) queryParams.append('city', params.city);
-  if (params?.brand_ids) {
-    params.brand_ids.forEach(id => queryParams.append('brand_ids', String(id)));
-  }
-  
-  const response = await api.get(`/api/shops?${queryParams.toString()}`);
+  const response = await api.get('/api/shops', { params });
   return response.data;
 }
 
@@ -50,30 +40,6 @@ export async function getNearbyShops(
   const response = await api.get('/api/shops/nearby', {
     params: { lat, lng, radius_km: radiusKm },
   });
-  return response.data;
-}
-
-export interface MapBounds {
-  minLat: number;
-  maxLat: number;
-  minLng: number;
-  maxLng: number;
-}
-
-export async function getShopsInBounds(
-  bounds: MapBounds,
-  brandIds?: number[]
-): Promise<Shop[]> {
-  const params = new URLSearchParams({
-    min_lat: String(bounds.minLat),
-    max_lat: String(bounds.maxLat),
-    min_lng: String(bounds.minLng),
-    max_lng: String(bounds.maxLng),
-  });
-  if (brandIds) {
-    brandIds.forEach(id => params.append('brand_ids', String(id)));
-  }
-  const response = await api.get(`/api/shops/bounds?${params.toString()}`);
   return response.data;
 }
 

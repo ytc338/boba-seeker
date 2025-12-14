@@ -1,7 +1,7 @@
 import './DrinkRec.css';
 
 interface DrinkRecProps {
-  brandNames?: string[];
+  brandName?: string;
 }
 
 // Drink recommendations by brand
@@ -37,42 +37,15 @@ const DRINK_RECS: Record<string, { name: string; nameZh?: string; description: s
   ],
 };
 
-export default function DrinkRec({ brandNames }: DrinkRecProps) {
-  // Get drinks for all selected brands, or default if none
-  const getDrinks = () => {
-    if (!brandNames || brandNames.length === 0) {
-      return { drinks: DRINK_RECS['default'], title: 'Popular Drinks' };
-    }
-
-    // Collect drinks from all selected brands
-    const allDrinks: { brand: string; name: string; nameZh?: string; description: string }[] = [];
-    brandNames.forEach(brandName => {
-      const brandDrinks = DRINK_RECS[brandName];
-      if (brandDrinks) {
-        brandDrinks.forEach(drink => {
-          allDrinks.push({ brand: brandName, ...drink });
-        });
-      }
-    });
-
-    // If no brand-specific drinks found, show default
-    if (allDrinks.length === 0) {
-      return { drinks: DRINK_RECS['default'], title: 'Popular Drinks' };
-    }
-
-    const title = brandNames.length === 1 
-      ? `${brandNames[0]} Picks` 
-      : `${brandNames.length} Brands Selected`;
-
-    return { drinks: allDrinks, title };
-  };
-
-  const { drinks, title } = getDrinks();
+export default function DrinkRec({ brandName }: DrinkRecProps) {
+  const drinks = brandName && DRINK_RECS[brandName] 
+    ? DRINK_RECS[brandName] 
+    : DRINK_RECS['default'];
 
   return (
     <div className="drink-rec">
       <h3 className="drink-rec-title">
-        🧋 {title}
+        🧋 {brandName ? `${brandName} Picks` : 'Popular Drinks'}
       </h3>
       <div className="drink-list">
         {drinks.map((drink, index) => (
@@ -80,9 +53,6 @@ export default function DrinkRec({ brandNames }: DrinkRecProps) {
             <div className="drink-name">
               {drink.name}
               {drink.nameZh && <span className="drink-name-zh">{drink.nameZh}</span>}
-              {'brand' in drink && (drink as { brand: string }).brand && (
-                <span className="drink-brand-tag">{(drink as { brand: string }).brand}</span>
-              )}
             </div>
             <p className="drink-description">{drink.description}</p>
           </div>

@@ -71,6 +71,194 @@ class GooglePlacesService:
             
             return shops
     
+    async def text_search(
+        self,
+        query: str,
+        region: str = "tw",
+        location: str = None
+    ) -> list[dict]:
+        """
+        Search places by text query (e.g., '50嵐 台北').
+        Better for brand-specific searches.
+        
+        Args:
+            query: Text query like "50嵐 台北" or "CoCo 高雄"
+            region: Region bias (tw, us)
+            location: Optional "lat,lng" to bias results
+            
+        Returns:
+            List of shop data dicts
+        """
+        if not self.api_key:
+            return []
+        
+        params = {
+            "query": query,
+            "region": region,
+            "key": self.api_key
+        }
+        
+        if location:
+            params["location"] = location
+            params["radius"] = 50000  # 50km radius
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.BASE_URL}/textsearch/json",
+                params=params
+            )
+            data = response.json()
+            
+            if data.get("status") not in ["OK", "ZERO_RESULTS"]:
+                print(f"Text search error: {data.get('status')} - {data.get('error_message', '')}")
+                return [], None
+            
+            shops = []
+            for place in data.get("results", []):
+                country = "TW" if region == "tw" else "US"
+                shops.append(self._parse_place(place, country))
+            
+            # Handle pagination if there are more results
+            next_token = data.get("next_page_token")
+            
+            return shops, next_token
+    
+    async def text_search_all_pages(
+        self,
+        query: str,
+        region: str = "tw",
+        max_results: int = 60
+    ) -> list[dict]:
+        """
+        Search with pagination, up to max_results.
+        """
+        import asyncio
+        
+        all_shops = []
+        next_token = None
+        
+        while len(all_shops) < max_results:
+            if next_token:
+                # Must wait 2 seconds before using next_page_token
+                await asyncio.sleep(2)
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(
+                        f"{self.BASE_URL}/textsearch/json",
+                        params={
+                            "pagetoken": next_token,
+                            "key": self.api_key
+                        }
+                    )
+                    data = response.json()
+                    
+                    for place in data.get("results", []):
+                        country = "TW" if region == "tw" else "US"
+                        all_shops.append(self._parse_place(place, country))
+                    
+                    next_token = data.get("next_page_token")
+            else:
+                shops, next_token = await self.text_search(query, region)
+                all_shops.extend(shops)
+            
+            if not next_token:
+                break
+        
+        return all_shops[:max_results]
+    
+    async def nearby_search(
+        self,
+        lat: float,
+        lng: float,
+        keyword: str,
+        radius_meters: int = 25000,
+        country: str = "TW"
+    ) -> tuple[list[dict], str]:
+        """
+        Search for places near a specific location.
+        Better for systematic grid coverage.
+        
+        Args:
+            lat: Latitude of search center
+            lng: Longitude of search center
+            keyword: Search keyword (brand name)
+            radius_meters: Search radius (max 50000)
+            country: Country code for result parsing
+            
+        Returns:
+            Tuple of (shops list, next_page_token)
+        """
+        if not self.api_key:
+            return [], None
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.BASE_URL}/nearbysearch/json",
+                params={
+                    "location": f"{lat},{lng}",
+                    "radius": radius_meters,
+                    "keyword": keyword,
+                    "key": self.api_key
+                }
+            )
+            data = response.json()
+            
+            if data.get("status") not in ["OK", "ZERO_RESULTS"]:
+                print(f"Nearby search error: {data.get('status')} - {data.get('error_message', '')}")
+                return [], None
+            
+            shops = []
+            for place in data.get("results", []):
+                shops.append(self._parse_place(place, country))
+            
+            next_token = data.get("next_page_token")
+            return shops, next_token
+    
+    async def nearby_search_all_pages(
+        self,
+        lat: float,
+        lng: float,
+        keyword: str,
+        radius_meters: int = 25000,
+        country: str = "TW",
+        max_results: int = 60
+    ) -> list[dict]:
+        """
+        Nearby search with pagination, up to max_results (max 60).
+        """
+        import asyncio
+        
+        all_shops = []
+        next_token = None
+        
+        while len(all_shops) < max_results:
+            if next_token:
+                await asyncio.sleep(2)  # Required wait before using page token
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(
+                        f"{self.BASE_URL}/nearbysearch/json",
+                        params={
+                            "pagetoken": next_token,
+                            "key": self.api_key
+                        }
+                    )
+                    data = response.json()
+                    
+                    for place in data.get("results", []):
+                        all_shops.append(self._parse_place(place, country))
+                    
+                    next_token = data.get("next_page_token")
+            else:
+                shops, next_token = await self.nearby_search(
+                    lat, lng, keyword, radius_meters, country
+                )
+                all_shops.extend(shops)
+            
+            if not next_token:
+                break
+        
+        return all_shops[:max_results]
+
+    
     async def get_place_details(self, place_id: str) -> Optional[dict]:
         """Get detailed info about a specific place"""
         if not self.api_key:

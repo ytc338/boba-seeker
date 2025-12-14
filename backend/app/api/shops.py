@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
-from typing import Optional, List
+from typing import Optional
 
 from ..database import get_db
 from ..models import Shop
@@ -12,10 +12,10 @@ router = APIRouter()
 @router.get("", response_model=ShopListResponse)
 def list_shops(
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
+    page_size: int = Query(20, ge=1, le=10000),
     country: Optional[str] = None,
     city: Optional[str] = None,
-    brand_ids: Optional[List[int]] = Query(None),
+    brand_id: Optional[int] = None,
     db: Session = Depends(get_db)
 ):
     """List all shops with pagination and filters"""
@@ -25,8 +25,8 @@ def list_shops(
         query = query.filter(Shop.country == country)
     if city:
         query = query.filter(Shop.city == city)
-    if brand_ids:
-        query = query.filter(Shop.brand_id.in_(brand_ids))
+    if brand_id:
+        query = query.filter(Shop.brand_id == brand_id)
     
     total = query.count()
     shops = query.offset((page - 1) * page_size).limit(page_size).all()
@@ -50,26 +50,6 @@ def search_shops(
         (Shop.name.ilike(f"%{q}%")) | (Shop.address.ilike(f"%{q}%"))
     ).limit(limit).all()
     return shops
-
-
-@router.get("/bounds", response_model=list[ShopResponse])
-def shops_in_bounds(
-    min_lat: float = Query(..., ge=-90, le=90),
-    max_lat: float = Query(..., ge=-90, le=90),
-    min_lng: float = Query(..., ge=-180, le=180),
-    max_lng: float = Query(..., ge=-180, le=180),
-    brand_ids: Optional[List[int]] = Query(None),
-    limit: int = Query(100, ge=1, le=500),
-    db: Session = Depends(get_db)
-):
-    """Find shops within map bounds"""
-    query = db.query(Shop).filter(
-        Shop.latitude.between(min_lat, max_lat),
-        Shop.longitude.between(min_lng, max_lng)
-    )
-    if brand_ids:
-        query = query.filter(Shop.brand_id.in_(brand_ids))
-    return query.limit(limit).all()
 
 
 @router.get("/nearby", response_model=list[ShopResponse])

@@ -1,0 +1,212 @@
+.filter-fab {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 100;
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  display: flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.filter-fab:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.filter-fab.active {
+  background: var(--accent);
+  color: white;
+}
+
+.filter-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--accent);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Filter Panel */
+.filter-panel {
+  position: absolute;
+  top: 55px;
+  left: 10px;
+  right: auto;
+  width: 300px;
+  z-index: 90;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 16px;
+}
+
+.filter-panel.open {
+  max-height: 450px;
+  padding: 16px;
+}
+
+.filter-section {
+  margin-bottom: 16px;
+}
+
+.filter-section:last-child {
+  margin-bottom: 0;
+}
+
+.filter-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* Region buttons */
+.region-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.region-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.region-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.region-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* Brand checkboxes */
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.brand-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.brand-checkbox:hover {
+  border-color: var(--accent);
+}
+
+.brand-checkbox.checked {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.brand-checkbox input {
+  display: none;
+}
+
+.checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.brand-checkbox.checked .checkmark {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.brand-name {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Clear filters button */
+.clear-filters {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-filters:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+  .filter-panel {
+    left: auto;
+    right: 16px;
+    width: 320px;
+    top: 80px;
+  }
+
+  .brand-grid {
+    grid-template-columns: 1fr;
+    max-height: 250px;
+  }
+}

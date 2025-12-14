@@ -1,7 +1,16 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text, DateTime, Enum
 from sqlalchemy.orm import relationship
+from datetime import datetime
+import enum
 
 from .database import Base
+
+
+class ShopStatus(enum.Enum):
+    """Status of a shop"""
+    ACTIVE = "active"
+    CLOSED = "closed"
+    UNVERIFIED = "unverified"
 
 
 class Brand(Base):
@@ -40,6 +49,13 @@ class Shop(Base):
     phone = Column(String(50))
     hours = Column(Text)  # JSON string of opening hours
     photo_url = Column(String(500))
-    google_place_id = Column(String(100))
+    google_place_id = Column(String(100), unique=True, index=True)
+    
+    # Maintenance fields
+    status = Column(String(20), default="active")  # active, closed, unverified
+    last_verified = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     brand = relationship("Brand", back_populates="shops")
+
