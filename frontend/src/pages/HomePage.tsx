@@ -1,77 +1,116 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Shop, Brand } from '../types';
-import { getShops, getBrands } from '../services/api';
+import { getNearbyShops, getBrands } from '../services/api';
 import Map from '../components/Map';
 import FilterPanel from '../components/FilterPanel';
 import BottomSheet from '../components/BottomSheet';
 import './HomePage.css';
 
-type CountryFilter = 'all' | 'TW' | 'US';
+// Default center: Taipei
+const DEFAULT_CENTER = { lat: 25.03, lng: 121.5 };
 
 export default function HomePage() {
   // Data state
-  const [allShops, setAllShops] = useState<Shop[]>([]);
+  const [shops, setShops] = useState<Shop[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   
   // Filter state
-  const [countryFilter, setCountryFilter] = useState<CountryFilter>('TW');
   const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
   
   // Loading state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Map bounds for "Search This Area"
+  const [mapBounds, setMapBounds] = useState<{
+    minLat: number; maxLat: number; minLng: number; maxLng: number;
+  } | null>(null);
+  const [showSearchButton, setShowSearchButton] = useState(false);
 
   // Fetch brands on mount
   useEffect(() => {
-    async function fetchBrands() {
-      try {
-        const data = await getBrands();
-        setBrands(data);
-      } catch (err) {
-        console.error('Failed to fetch brands:', err);
-      }
-    }
-    fetchBrands();
+    getBrands()
+      .then(setBrands)
+      .catch((err) => console.error('Failed to fetch brands:', err));
   }, []);
 
-  // Fetch shops when REGION changes (backend filter)
+  // Load nearby shops based on center point
+  const loadNearbyShops = useCallback(async (lat: number, lng: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getNearbyShops(lat, lng, 10); // 10km radius
+      setShops(data);
+    } catch (err) {
+      console.error('Failed to fetch nearby shops:', err);
+      setError('Failed to load shops.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // On mount: try GPS, fallback to Taipei
   useEffect(() => {
-    async function fetchShops() {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const params: { country?: string; page_size: number } = {
-          page_size: 5000, // Load all shops in region
-        };
-        if (countryFilter !== 'all') {
-          params.country = countryFilter;
-        }
-        
-        const response = await getShops(params);
-        setAllShops(response.shops);
-        setSelectedShop(null); // Clear selection on region change
-      } catch (err) {
-        console.error('Failed to fetch shops:', err);
-        setError('Failed to load shops. Make sure the backend is running.');
-      } finally {
-        setLoading(false);
-      }
+    if (!navigator.geolocation) {
+      loadNearbyShops(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng);
+      return;
     }
 
-    fetchShops();
-  }, [countryFilter]);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        loadNearbyShops(position.coords.latitude, position.coords.longitude);
+      },
+      () => {
+        // Denied or error - fallback to Taipei
+        loadNearbyShops(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng);
+      },
+      { enableHighAccuracy: true, timeout: 5000 }
+    );
+  }, [loadNearbyShops]);
 
-  // Client-side filtering by brand (instant!)
+  // Handle map movement - show search button
+  const handleMapMove = useCallback((bounds: {
+    minLat: number; maxLat: number; minLng: number; maxLng: number;
+  }) => {
+    setMapBounds(bounds);
+    setShowSearchButton(true);
+  }, []);
+
+  // Search this area
+  const handleSearchArea = useCallback(async () => {
+    if (!mapBounds) return;
+    
+    // Calculate center of visible bounds
+    const centerLat = (mapBounds.minLat + mapBounds.maxLat) / 2;
+    const centerLng = (mapBounds.minLng + mapBounds.maxLng) / 2;
+    
+    // Calculate approximate radius from bounds
+    const latDiff = (mapBounds.maxLat - mapBounds.minLat) / 2;
+    const radiusKm = latDiff * 111; // 1 degree ≈ 111km
+    
+    try {
+      setLoading(true);
+      setShowSearchButton(false);
+      const data = await getNearbyShops(centerLat, centerLng, Math.max(radiusKm, 5));
+      setShops(data);
+    } catch (err) {
+      console.error('Failed to search area:', err);
+      setError('Failed to search this area.');
+    } finally {
+      setLoading(false);
+    }
+  }, [mapBounds]);
+
+  // Client-side filtering by brand
   const filteredShops = useMemo(() => {
     if (selectedBrands.length === 0) {
-      return allShops; // No brand filter = show all
+      return shops;
     }
-    return allShops.filter(
+    return shops.filter(
       (shop) => shop.brand_id && selectedBrands.includes(shop.brand_id)
     );
-  }, [allShops, selectedBrands]);
+  }, [shops, selectedBrands]);
 
   // Toggle brand selection
   const handleBrandToggle = (brandId: number) => {
@@ -95,20 +134,22 @@ export default function HomePage() {
           shops={filteredShops}
           selectedShop={selectedShop}
           onShopSelect={setSelectedShop}
+          onMapMove={handleMapMove}
+          showSearchButton={showSearchButton}
+          onSearchClick={handleSearchArea}
+          searchLoading={loading}
         />
       </div>
 
-      {/* Filter Panel (FAB + slide-down) - positioned below map controls */}
+      {/* Filter Panel */}
       <FilterPanel
         brands={brands}
         selectedBrands={selectedBrands}
         onBrandToggle={handleBrandToggle}
-        countryFilter={countryFilter}
-        onCountryChange={setCountryFilter}
         onClearFilters={handleClearFilters}
       />
 
-      {/* Bottom Sheet (shop list) */}
+      {/* Bottom Sheet */}
       <BottomSheet
         shops={filteredShops}
         selectedShop={selectedShop}

@@ -11,16 +11,31 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 const DEFAULT_CENTER: [number, number] = [121.5, 25.03];
 const DEFAULT_ZOOM = 13;
 
+interface MapBounds {
+  minLat: number;
+  maxLat: number;
+  minLng: number;
+  maxLng: number;
+}
+
 interface MapProps {
   shops: Shop[];
   selectedShop?: Shop | null;
   onShopSelect?: (shop: Shop) => void;
+  onMapMove?: (bounds: MapBounds) => void;
+  showSearchButton?: boolean;
+  onSearchClick?: () => void;
+  searchLoading?: boolean;
 }
 
 export default function Map({
   shops,
   selectedShop,
   onShopSelect,
+  onMapMove,
+  showSearchButton = false,
+  onSearchClick,
+  searchLoading = false,
 }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -29,12 +44,18 @@ export default function Map({
   const [locating, setLocating] = useState(false);
   const [mapReady, setMapReady] = useState(false);
   const shopsRef = useRef<Shop[]>([]);
+  const hasMovedRef = useRef(false);
   
   const onShopSelectRef = useRef(onShopSelect);
+  const onMapMoveRef = useRef(onMapMove);
   
   useEffect(() => {
     onShopSelectRef.current = onShopSelect;
   }, [onShopSelect]);
+
+  useEffect(() => {
+    onMapMoveRef.current = onMapMove;
+  }, [onMapMove]);
 
   useEffect(() => {
     shopsRef.current = shops;
@@ -57,7 +78,6 @@ export default function Map({
         zoom: DEFAULT_ZOOM,
       });
 
-      // Add navigation control (zoom buttons) - top right
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
       map.current.on('load', () => {
@@ -69,7 +89,7 @@ export default function Map({
           data: { type: 'FeatureCollection', features: [] },
         });
 
-        // Simple circle markers (clean and small)
+        // Simple circle markers
         map.current.addLayer({
           id: 'shop-markers',
           type: 'circle',
@@ -117,14 +137,36 @@ export default function Map({
         setMapReady(true);
       });
 
+      // Track map movement for "Search This Area"
+      map.current.on('moveend', () => {
+        if (!map.current || !hasMovedRef.current) return;
+        
+        const bounds = map.current.getBounds();
+        if (bounds && onMapMoveRef.current) {
+          onMapMoveRef.current({
+            minLat: bounds.getSouth(),
+            maxLat: bounds.getNorth(),
+            minLng: bounds.getWest(),
+            maxLng: bounds.getEast(),
+          });
+        }
+      });
+
+      // Mark that user has moved the map (ignore initial load)
+      map.current.on('dragstart', () => {
+        hasMovedRef.current = true;
+      });
+      map.current.on('zoomstart', () => {
+        hasMovedRef.current = true;
+      });
+
       // Try to get user location on init
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
-            const { latitude, longitude } = position.coords;
             if (map.current) {
               map.current.flyTo({
-                center: [longitude, latitude],
+                center: [position.coords.longitude, position.coords.latitude],
                 zoom: DEFAULT_ZOOM,
                 duration: 1500,
               });
@@ -178,20 +220,17 @@ export default function Map({
   useEffect(() => {
     if (!map.current || !mapReady) return;
 
-    // Update filter for selected layer
     map.current.setFilter('shop-markers-selected', [
       '==',
       ['get', 'id'],
       selectedShop?.id ?? -1,
     ]);
 
-    // Remove old popup
     if (popup.current) {
       popup.current.remove();
       popup.current = null;
     }
 
-    // Add popup for selected shop
     if (selectedShop) {
       popup.current = new mapboxgl.Popup({ offset: 15, closeButton: true })
         .setLngLat([selectedShop.longitude, selectedShop.latitude])
@@ -221,12 +260,10 @@ export default function Map({
       (position) => {
         const { latitude, longitude } = position.coords;
 
-        // Remove old user marker
         if (userMarker.current) {
           userMarker.current.remove();
         }
 
-        // Create blue dot marker for user location
         const el = document.createElement('div');
         el.className = 'user-location-dot';
 
@@ -264,7 +301,18 @@ export default function Map({
       )}
       <div ref={mapContainer} className="map" />
 
-      {/* Locate Me Button - positioned below navigation controls */}
+      {/* Search This Area Button */}
+      {mapboxgl.accessToken && showSearchButton && (
+        <button
+          className="search-area-button"
+          onClick={onSearchClick}
+          disabled={searchLoading}
+        >
+          {searchLoading ? 'Searching...' : 'Search This Area'}
+        </button>
+      )}
+
+      {/* Locate Me Button */}
       {mapboxgl.accessToken && (
         <button
           className="locate-button"

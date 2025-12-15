@@ -57,14 +57,17 @@ def nearby_shops(
     lat: float = Query(..., ge=-90, le=90),
     lng: float = Query(..., ge=-180, le=180),
     radius_km: float = Query(5, ge=0.1, le=50),
-    limit: int = Query(20, ge=1, le=100),
+    limit: int = Query(500, ge=1, le=500),
     db: Session = Depends(get_db)
 ):
     """Find shops near a location (simple distance calculation)"""
+    import math
     # Simple bounding box filter (not perfect sphere distance)
     # 1 degree latitude ≈ 111km
     lat_delta = radius_km / 111
-    lng_delta = radius_km / (111 * abs(lat) if lat != 0 else 111)
+    # 1 degree longitude varies by latitude: 111km * cos(lat)
+    cos_lat = math.cos(math.radians(lat)) if lat != 0 else 1
+    lng_delta = radius_km / (111 * cos_lat)
     
     shops = db.query(Shop).filter(
         Shop.latitude.between(lat - lat_delta, lat + lat_delta),
