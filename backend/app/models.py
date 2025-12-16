@@ -48,7 +48,7 @@ class Shop(Base):
     rating_count = Column(Integer)
     phone = Column(String(50))
     hours = Column(Text)  # JSON string of opening hours
-    photo_url = Column(String(500))
+    photo_url = Column(String(1000))  # Google Photos URLs can be long
     google_place_id = Column(String(100), unique=True, index=True)
     
     # Maintenance fields
