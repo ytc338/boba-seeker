@@ -17,12 +17,9 @@ services:
           name: boba-seeker-db
           property: connectionString
       - key: FRONTEND_URL
-        fromService:
-          name: boba-seeker-frontend
-          type: web
-          property: url
+        sync: false  # Set to frontend URL after deploy (e.g., https://boba-seeker-frontend.onrender.com)
       - key: GOOGLE_PLACES_API_KEY
-        sync: false  # Set manually in Render dashboard
+        sync: false  # Optional: Set in Render dashboard
     healthCheckPath: /health
 
   - type: web
@@ -34,13 +31,11 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: boba-seeker-backend
-          type: web
-          property: url
+        sync: false  # Set to backend URL after deploy (e.g., https://boba-seeker-backend.onrender.com)
       - key: VITE_MAPBOX_TOKEN
-        sync: false  # Set manually in Render dashboard
+        sync: false  # Required: Set in Render dashboard
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+
