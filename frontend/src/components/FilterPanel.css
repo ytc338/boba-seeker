@@ -120,7 +120,14 @@
   gap: 8px;
   max-height: 200px;
   overflow-y: auto;
-  padding-right: 4px;
+}
+
+.no-brands {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  padding: 16px;
+  font-size: 0.85rem;
 }
 
 .brand-checkbox {

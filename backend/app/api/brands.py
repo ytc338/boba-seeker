@@ -1,16 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from typing import Optional
 
 from ..database import get_db
-from ..models import Brand
+from ..models import Brand, Shop
 from ..schemas import BrandResponse, BrandCreate
 
 router = APIRouter()
 
 
 @router.get("", response_model=list[BrandResponse])
-def list_brands(db: Session = Depends(get_db)):
-    """List all brands"""
+def list_brands(
+    country: Optional[str] = Query(None, description="Filter brands by country with shop presence"),
+    db: Session = Depends(get_db)
+):
+    """List brands, optionally filtered by country with shop presence"""
+    if country:
+        # Only return brands that have at least one shop in this country
+        return db.query(Brand).join(Shop).filter(
+            Shop.country == country
+        ).distinct().all()
     return db.query(Brand).all()
 
 

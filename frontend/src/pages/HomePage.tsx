@@ -9,6 +9,24 @@ import './HomePage.css';
 // Default center: Taipei
 const DEFAULT_CENTER = { lat: 25.03, lng: 121.5 };
 
+// Helper to detect region from coordinates
+function detectRegion(lat: number, lng: number): string {
+  // Taiwan bounding box (approximate)
+  if (lat >= 21.5 && lat <= 26.5 && lng >= 119.5 && lng <= 122.5) {
+    return 'TW';
+  }
+  // Singapore bounding box (approximate)
+  if (lat >= 1.1 && lat <= 1.5 && lng >= 103.6 && lng <= 104.1) {
+    return 'SG';
+  }
+  // USA bounding box (very rough - continental US)
+  if (lat >= 24 && lat <= 50 && lng >= -125 && lng <= -66) {
+    return 'US';
+  }
+  // Default to showing all
+  return '';
+}
+
 export default function HomePage() {
   // Data state
   const [shops, setShops] = useState<Shop[]>([]);
@@ -17,6 +35,7 @@ export default function HomePage() {
   
   // Filter state
   const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
+  const [selectedRegion, setSelectedRegion] = useState<string>(''); // '' = All
   
   // Loading state
   const [loading, setLoading] = useState(true);
@@ -28,12 +47,15 @@ export default function HomePage() {
   } | null>(null);
   const [showSearchButton, setShowSearchButton] = useState(false);
 
-  // Fetch brands on mount
+  // Fetch brands when region changes
   useEffect(() => {
-    getBrands()
+    getBrands(selectedRegion || undefined)
       .then(setBrands)
       .catch((err) => console.error('Failed to fetch brands:', err));
-  }, []);
+    
+    // Clear brand selection when region changes
+    setSelectedBrands([]);
+  }, [selectedRegion]);
 
   // Load nearby shops based on center point
   const loadNearbyShops = useCallback(async (lat: number, lng: number) => {
@@ -42,6 +64,10 @@ export default function HomePage() {
       setError(null);
       const data = await getNearbyShops(lat, lng, 10); // 10km radius
       setShops(data);
+      
+      // Auto-detect and set region based on coordinates
+      const detectedRegion = detectRegion(lat, lng);
+      setSelectedRegion(detectedRegion);
     } catch (err) {
       console.error('Failed to fetch nearby shops:', err);
       setError('Failed to load shops.');
@@ -94,6 +120,10 @@ export default function HomePage() {
       setShowSearchButton(false);
       const data = await getNearbyShops(centerLat, centerLng, Math.max(radiusKm, 5));
       setShops(data);
+      
+      // Update region based on new map center
+      const detectedRegion = detectRegion(centerLat, centerLng);
+      setSelectedRegion(detectedRegion);
     } catch (err) {
       console.error('Failed to search area:', err);
       setError('Failed to search this area.');
@@ -121,6 +151,11 @@ export default function HomePage() {
     );
   };
 
+  // Handle region change
+  const handleRegionChange = (region: string) => {
+    setSelectedRegion(region);
+  };
+
   // Clear all filters
   const handleClearFilters = () => {
     setSelectedBrands([]);
@@ -145,7 +180,9 @@ export default function HomePage() {
       <FilterPanel
         brands={brands}
         selectedBrands={selectedBrands}
+        selectedRegion={selectedRegion}
         onBrandToggle={handleBrandToggle}
+        onRegionChange={handleRegionChange}
         onClearFilters={handleClearFilters}
       />
 
