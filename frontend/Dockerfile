@@ -14,8 +14,8 @@ ENV VITE_API_URL=$VITE_API_URL
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (with BuildKit cache)
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 # Copy source code
 COPY . .
