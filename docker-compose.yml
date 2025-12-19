@@ -4,6 +4,8 @@ services:
     container_name: boba-backend
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       - GOOGLE_PLACES_API_KEY=${GOOGLE_PLACES_API_KEY:-}
     volumes:

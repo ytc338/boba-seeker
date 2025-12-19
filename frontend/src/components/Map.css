@@ -45,10 +45,10 @@
   font-size: 0.85rem;
 }
 
-/* Locate button - positioned below map navigation controls */
+/* Locate button - positioned below filter FAB */
 .locate-button {
   position: absolute;
-  top: 120px; /* Below the zoom controls */
+  top: 55px; /* Below the filter FAB (10px + 40px + 5px gap) */
   right: 10px;
   z-index: 10;
   width: 30px;
@@ -72,6 +72,13 @@
 .locate-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Desktop: adjust locate button position */
+@media (min-width: 768px) {
+  .locate-button {
+    top: 10px; /* On desktop, filter FAB moves down, so locate can be at top */
+  }
 }
 
 /* Search This Area button */

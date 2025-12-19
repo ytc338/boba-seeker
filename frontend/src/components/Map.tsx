@@ -78,7 +78,7 @@ export default function Map({
         zoom: DEFAULT_ZOOM,
       });
 
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      // Note: NavigationControl (+/-) removed for cleaner UI
 
       map.current.on('load', () => {
         if (!map.current) return;
