@@ -62,8 +62,11 @@
 .sheet-shop-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0 16px 16px;
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  padding: 0 16px;
+  padding-bottom: max(32px, calc(16px + env(safe-area-inset-bottom)));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 /* Desktop sidebar mode */
@@ -72,11 +75,11 @@
     left: 16px;
     right: auto;
     width: 380px;
-    top: 80px;
+    top: 16px;
     bottom: 16px;
     border-radius: 16px;
     max-height: none;
-    height: calc(100vh - 112px);
+    height: auto;
   }
 
   .bottom-sheet.collapsed,

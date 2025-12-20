@@ -117,6 +117,7 @@ export default function HomePage() {
     
     try {
       setLoading(true);
+      setError(null);
       setShowSearchButton(false);
       const data = await getNearbyShops(centerLat, centerLng, Math.max(radiusKm, 5));
       setShops(data);
