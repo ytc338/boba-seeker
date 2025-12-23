@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Bottom Sheet Mockups - Boba Seeker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #ff6b9d, #c44569);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+            font-size: 0.95rem;
+        }
+
+        .mockups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .mockup-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mockup-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ff6b9d;
+        }
+
+        .mockup-desc {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* iPhone Frame with Safari Chrome */
+        .iphone-frame {
+            width: 260px;
+            height: 540px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            margin: 0 auto 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .iphone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f0f0f0;
+            border-radius: 34px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Dynamic Island / Notch */
+        .dynamic-island {
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 28px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 100;
+        }
+
+        /* Safari Top Bar */
+        .safari-header {
+            background: linear-gradient(180deg, #f8f8f8 0%, #f0f0f0 100%);
+            padding: 40px 12px 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .safari-url-bar {
+            flex: 1;
+            background: #fff;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .safari-url-bar .lock {
+            color: #34c759;
+            margin-right: 4px;
+        }
+
+        /* Safari Bottom Toolbar */
+        .safari-footer {
+            background: linear-gradient(180deg, #f0f0f0 0%, #f8f8f8 100%);
+            padding: 8px 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .safari-btn {
+            font-size: 18px;
+            color: #007AFF;
+            width: 32px;
+            text-align: center;
+        }
+
+        /* App Viewport (the actual app area) */
+        .app-viewport {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Height labels */
+        .height-indicator {
+            position: absolute;
+            right: -55px;
+            font-size: 9px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .height-indicator::before {
+            content: '';
+            width: 20px;
+            height: 1px;
+            background: #888;
+        }
+
+        .height-badge {
+            background: rgba(255, 107, 157, 0.2);
+            color: #ff6b9d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Map area */
+        .map-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, #e8f4e8 0%, #d4e8d4 100%);
+        }
+
+        .map-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(180, 200, 180, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(180, 200, 180, 0.3) 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        .map-roads {
+            position: absolute;
+            inset: 0;
+        }
+
+        .road {
+            position: absolute;
+            background: #fff;
+        }
+
+        .road.h1 {
+            top: 25%;
+            left: 0;
+            right: 0;
+            height: 6px;
+        }
+
+        .road.h2 {
+            top: 55%;
+            left: 0;
+            right: 0;
+            height: 5px;
+        }
+
+        .road.v1 {
+            left: 30%;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+        }
+
+        .road.v2 {
+            left: 75%;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+        }
+
+        /* Shop markers */
+        .shop-marker {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #e91e63;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transform: translate(-50%, -50%);
+        }
+
+        .shop-marker.selected {
+            width: 20px;
+            height: 20px;
+            background: #c2185b;
+            border-width: 3px;
+            z-index: 10;
+        }
+
+        /* Popup */
+        .map-popup {
+            position: absolute;
+            background: #fff;
+            padding: 5px 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            font-size: 9px;
+            transform: translate(-50%, -100%);
+            margin-top: -6px;
+            white-space: nowrap;
+            z-index: 20;
+        }
+
+        .map-popup::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #fff;
+        }
+
+        .popup-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(10px);
+            border-radius: 14px 14px 0 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .sheet-handle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 10px 4px;
+        }
+
+        .handle-bar {
+            width: 28px;
+            height: 3px;
+            background: #ccc;
+            border-radius: 2px;
+            margin-bottom: 6px;
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 10px;
+        }
+
+        .sheet-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .shop-count {
+            color: #888;
+        }
+
+        .shop-list {
+            padding: 0 10px 10px;
+        }
+
+        .shop-card {
+            background: #f8f8f8;
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 6px;
+        }
+
+        .shop-card.selected {
+            background: linear-gradient(135deg, #fff0f5, #ffe4ec);
+            border: 1px solid #e91e63;
+        }
+
+        .shop-name {
+            font-weight: 600;
+            font-size: 10px;
+            color: #333;
+            margin-bottom: 1px;
+        }
+
+        .shop-address {
+            font-size: 8px;
+            color: #888;
+        }
+
+        /* Visible area overlay with percentage */
+        .area-overlay {
+            position: absolute;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .area-label {
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .area-label.good {
+            background: rgba(76, 175, 80, 0.8);
+        }
+
+        .area-label.bad {
+            background: rgba(244, 67, 54, 0.8);
+        }
+
+        .area-label.warn {
+            background: rgba(255, 152, 0, 0.8);
+        }
+
+        /* Pros/Cons */
+        .pros-cons {
+            display: flex;
+            gap: 12px;
+            font-size: 0.75rem;
+        }
+
+        .pros,
+        .cons {
+            flex: 1;
+        }
+
+        .pros h4 {
+            color: #4CAF50;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+        .cons h4 {
+            color: #ff6b6b;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+        .pros ul,
+        .cons ul {
+            padding-left: 14px;
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .section-divider {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        .section-divider h2 {
+            color: #c44569;
+            font-size: 1.3rem;
+        }
+
+        .section-divider p {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .comparison-note {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(255, 107, 157, 0.1);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: #ff6b9d;
+            border: 1px dashed rgba(255, 107, 157, 0.3);
+        }
+
+        .reality-box {
+            grid-column: 1 / -1;
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .reality-box h3 {
+            color: #f44336;
+            margin-bottom: 10px;
+        }
+
+        .reality-box p {
+            color: #bbb;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .reality-box code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ff6b9d;
+        }
+
+        .screen-breakdown {
+            display: flex;
+            gap: 20px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .breakdown-item {
+            flex: 1;
+            min-width: 150px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .breakdown-item .label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .breakdown-item .value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .breakdown-item .value.bad {
+            color: #f44336;
+        }
+
+        .breakdown-item .value.warn {
+            color: #ff9800;
+        }
+
+        .breakdown-item .value.good {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>📱 iPhone Safari Reality Check</h1>
+    <p class="subtitle">Mockups showing actual viewport with Safari browser chrome</p>
+
+    <div class="mockups-grid">
+        <!-- REALITY BOX -->
+        <div class="reality-box">
+            <h3>⚠️ The Real Problem on iPhone Safari</h3>
+            <p>
+                Safari's browser chrome (header + footer toolbar) consumes about <code>~28-30%</code> of the screen.
+                With the current <code>40vh</code> bottom sheet, users only see <strong>~30% of the screen as usable
+                    map</strong>.
+            </p>
+            <div class="screen-breakdown">
+                <div class="breakdown-item">
+                    <div class="label">Safari Header</div>
+                    <div class="value bad">~14%</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="label">Safari Footer</div>
+                    <div class="value bad">~14%</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="label">App Viewport</div>
+                    <div class="value warn">~72%</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="label">Current Sheet (40vh)</div>
+                    <div class="value bad">~29% of screen</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="label">Visible Map</div>
+                    <div class="value bad">~30% of screen</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CURRENT STATE (PROBLEM) -->
+        <div class="mockup-card">
+            <div class="mockup-title">❌ Current State (Problem)</div>
+            <div class="mockup-desc">40vh sheet + Safari chrome = only ~30% visible map</div>
+
+            <div class="iphone-frame">
+                <div class="iphone-screen">
+                    <div class="dynamic-island"></div>
+
+                    <!-- Safari Header -->
+                    <div class="safari-header">
+                        <div class="safari-url-bar">
+                            <span class="lock">🔒</span> boba-seeker.com
+                        </div>
+                    </div>
+
+                    <!-- App Viewport -->
+                    <div class="app-viewport">
+                        <div class="map-area">
+                            <div class="map-grid"></div>
+                            <div class="map-roads">
+                                <div class="road h1"></div>
+                                <div class="road h2"></div>
+                                <div class="road v1"></div>
+                                <div class="road v2"></div>
+                            </div>
+                            <div class="shop-marker" style="top: 20%; left: 40%;"></div>
+                            <div class="shop-marker" style="top: 35%; left: 65%;"></div>
+
+                            <!-- Visible map area indicator -->
+                            <div class="area-overlay" style="top: 0; bottom: 55%; background: rgba(76, 175, 80, 0.15);">
+                                <span class="area-label bad">~30% 😢</span>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Sheet - 40vh -->
+                        <div class="bottom-sheet" style="height: 55%;">
+                            <div class="sheet-handle">
+                                <div class="handle-bar"></div>
+                                <div class="sheet-header">
+                                    <span class="sheet-title">Boba Shops</span>
+                                    <span class="shop-count">12 found</span>
+                                </div>
+                            </div>
+                            <div class="shop-list">
+                                <div class="shop-card">
+                                    <div class="shop-name">Tiger Sugar</div>
+                                    <div class="shop-address">123 Main St</div>
+                                </div>
+                                <div class="shop-card">
+                                    <div class="shop-name">Gong Cha</div>
+                                    <div class="shop-address">456 Oak Ave</div>
+                                </div>
+                                <div class="shop-card">
+                                    <div class="shop-name">CoCo</div>
+                                    <div class="shop-address">789 Tea Lane</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Safari Footer -->
+                    <div class="safari-footer">
+                        <span class="safari-btn">◀</span>
+                        <span class="safari-btn">▶</span>
+                        <span class="safari-btn">⬆︎</span>
+                        <span class="safari-btn">📖</span>
+                        <span class="safari-btn">☐☐</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-note">
+                Map area is too small to explore. Users can't see enough context around shops.
+            </div>
+        </div>
+
+        <!-- SOLUTION A: Collapsible with peek -->
+        <div class="mockup-card">
+            <div class="mockup-title">A. Collapsible Peek Mode <span class="badge">Recommended</span></div>
+            <div class="mockup-desc">Default to "peek" (1-2 cards, ~25% of viewport). Tap to expand.</div>
+
+            <div class="iphone-frame">
+                <div class="iphone-screen">
+                    <div class="dynamic-island"></div>
+
+                    <div class="safari-header">
+                        <div class="safari-url-bar">
+                            <span class="lock">🔒</span> boba-seeker.com
+                        </div>
+                    </div>
+
+                    <div class="app-viewport">
+                        <div class="map-area">
+                            <div class="map-grid"></div>
+                            <div class="map-roads">
+                                <div class="road h1"></div>
+                                <div class="road h2"></div>
+                                <div class="road v1"></div>
+                                <div class="road v2"></div>
+                            </div>
+                            <div class="shop-marker" style="top: 15%; left: 35%;"></div>
+                            <div class="shop-marker" style="top: 30%; left: 70%;"></div>
+                            <div class="shop-marker" style="top: 45%; left: 45%;"></div>
+                            <div class="shop-marker" style="top: 55%; left: 25%;"></div>
+
+                            <div class="area-overlay" style="top: 0; bottom: 30%; background: rgba(76, 175, 80, 0.15);">
+                                <span class="area-label good">~50% ✓</span>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Sheet - Peek mode ~25% -->
+                        <div class="bottom-sheet" style="height: 30%;">
+                            <div class="sheet-handle">
+                                <div class="handle-bar"></div>
+                                <div class="sheet-header">
+                                    <span class="sheet-title">Boba Shops</span>
+                                    <span class="shop-count">↑ 12 found</span>
+                                </div>
+                            </div>
+                            <div class="shop-list">
+                                <div class="shop-card">
+                                    <div class="shop-name">Tiger Sugar</div>
+                                    <div class="shop-address">123 Main St</div>
+                                </div>
+                                <div class="shop-card" style="opacity: 0.5;">
+                                    <div class="shop-name">Gong Cha</div>
+                                    <div class="shop-address">456 Oak Ave...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="safari-footer">
+                        <span class="safari-btn">◀</span>
+                        <span class="safari-btn">▶</span>
+                        <span class="safari-btn">⬆︎</span>
+                        <span class="safari-btn">📖</span>
+                        <span class="safari-btn">☐☐</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✓ Pros</h4>
+                    <ul>
+                        <li>50% visible map</li>
+                        <li>Users still see 1-2 shops</li>
+                        <li>Swipe up to see more</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>✗ Cons</h4>
+                    <ul>
+                        <li>Extra gesture needed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SOLUTION B: Auto-collapse on selection -->
+        <div class="mockup-card">
+            <div class="mockup-title">B. Collapse on Map Tap</div>
+            <div class="mockup-desc">When user taps map or marker, sheet collapses to header only.</div>
+
+            <div class="iphone-frame">
+                <div class="iphone-screen">
+                    <div class="dynamic-island"></div>
+
+                    <div class="safari-header">
+                        <div class="safari-url-bar">
+                            <span class="lock">🔒</span> boba-seeker.com
+                        </div>
+                    </div>
+
+                    <div class="app-viewport">
+                        <div class="map-area">
+                            <div class="map-grid"></div>
+                            <div class="map-roads">
+                                <div class="road h1"></div>
+                                <div class="road h2"></div>
+                                <div class="road v1"></div>
+                                <div class="road v2"></div>
+                            </div>
+                            <div class="shop-marker" style="top: 15%; left: 30%;"></div>
+                            <div class="shop-marker selected" style="top: 40%; left: 55%;"></div>
+                            <div class="map-popup" style="top: 40%; left: 55%;">
+                                <span class="popup-name">🧋 CoCo</span>
+                            </div>
+                            <div class="shop-marker" style="top: 60%; left: 75%;"></div>
+                            <div class="shop-marker" style="top: 75%; left: 35%;"></div>
+
+                            <div class="area-overlay" style="top: 0; bottom: 12%; background: rgba(76, 175, 80, 0.15);">
+                                <span class="area-label good">~65% ✓✓</span>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Sheet - Collapsed -->
+                        <div class="bottom-sheet" style="height: 12%;">
+                            <div class="sheet-handle">
+                                <div class="handle-bar"></div>
+                                <div class="sheet-header">
+                                    <span class="sheet-title">🧋 CoCo selected</span>
+                                    <span class="shop-count">↑ expand</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="safari-footer">
+                        <span class="safari-btn">◀</span>
+                        <span class="safari-btn">▶</span>
+                        <span class="safari-btn">⬆︎</span>
+                        <span class="safari-btn">📖</span>
+                        <span class="safari-btn">☐☐</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✓ Pros</h4>
+                    <ul>
+                        <li>Maximum map visibility</li>
+                        <li>Focus on selection</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>✗ Cons</h4>
+                    <ul>
+                        <li>Must expand to browse</li>
+                        <li>Less discoverability</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SOLUTION C: Fullscreen map with floating cards -->
+        <div class="mockup-card">
+            <div class="mockup-title">C. Floating Card Carousel</div>
+            <div class="mockup-desc">Horizontal scrollable cards at bottom. Map fills screen.</div>
+
+            <div class="iphone-frame">
+                <div class="iphone-screen">
+                    <div class="dynamic-island"></div>
+
+                    <div class="safari-header">
+                        <div class="safari-url-bar">
+                            <span class="lock">🔒</span> boba-seeker.com
+                        </div>
+                    </div>
+
+                    <div class="app-viewport">
+                        <div class="map-area">
+                            <div class="map-grid"></div>
+                            <div class="map-roads">
+                                <div class="road h1"></div>
+                                <div class="road h2"></div>
+                                <div class="road v1"></div>
+                                <div class="road v2"></div>
+                            </div>
+                            <div class="shop-marker" style="top: 15%; left: 30%;"></div>
+                            <div class="shop-marker selected" style="top: 35%; left: 55%;"></div>
+                            <div class="map-popup" style="top: 35%; left: 55%;">
+                                <span class="popup-name">🧋 Tiger Sugar</span>
+                            </div>
+                            <div class="shop-marker" style="top: 55%; left: 75%;"></div>
+                            <div class="shop-marker" style="top: 70%; left: 25%;"></div>
+
+                            <div class="area-overlay" style="top: 0; bottom: 22%; background: rgba(76, 175, 80, 0.15);">
+                                <span class="area-label good">~55% ✓</span>
+                            </div>
+                        </div>
+
+                        <!-- Floating carousel -->
+                        <div
+                            style="position: absolute; bottom: 0; left: 0; right: 0; padding: 8px; display: flex; gap: 8px; overflow-x: auto;">
+                            <div class="shop-card selected" style="min-width: 140px; margin: 0;">
+                                <div class="shop-name">Tiger Sugar</div>
+                                <div class="shop-address">123 Main St</div>
+                            </div>
+                            <div class="shop-card" style="min-width: 140px; margin: 0;">
+                                <div class="shop-name">Gong Cha</div>
+                                <div class="shop-address">456 Oak Ave</div>
+                            </div>
+                            <div class="shop-card" style="min-width: 120px; margin: 0; opacity: 0.6;">
+                                <div class="shop-name">CoCo...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="safari-footer">
+                        <span class="safari-btn">◀</span>
+                        <span class="safari-btn">▶</span>
+                        <span class="safari-btn">⬆︎</span>
+                        <span class="safari-btn">📖</span>
+                        <span class="safari-btn">☐☐</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✓ Pros</h4>
+                    <ul>
+                        <li>Map-first UX</li>
+                        <li>Like Google Maps</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>✗ Cons</h4>
+                    <ul>
+                        <li>Harder to browse list</li>
+                        <li>More dev effort</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: Map Centering -->
+        <div class="section-divider">
+            <h2>🎯 Map Centering Fix</h2>
+            <p>When shop is selected, center it in the <strong>visible</strong> map area, not behind the sheet</p>
+        </div>
+
+        <!-- Centering Problem -->
+        <div class="mockup-card">
+            <div class="mockup-title">❌ Current: Centers to viewport</div>
+            <div class="mockup-desc">Selected shop ends up at edge/behind the bottom sheet</div>
+
+            <div class="iphone-frame">
+                <div class="iphone-screen">
+                    <div class="dynamic-island"></div>
+
+                    <div class="safari-header">
+                        <div class="safari-url-bar">
+                            <span class="lock">🔒</span> boba-seeker.com
+                        </div>
+                    </div>
+
+                    <div class="app-viewport">
+                        <div class="map-area">
+                            <div class="map-grid"></div>
+                            <div class="map-roads">
+                                <div class="road h1"></div>
+                                <div class="road h2"></div>
+                                <div class="road v1"></div>
+                                <div class="road v2"></div>
+                            </div>
+
+                            <!-- Viewport center indicator -->
+                            <div
+                                style="position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; border: 2px solid #2196F3; border-radius: 50%; transform: translate(-50%, -50%);">
+                            </div>
+                            <div
+                                style="position: absolute; top: 50%; left: 42%; right: 42%; height: 2px; background: #2196F3;">
+                            </div>
+                            <div
+                                style="position: absolute; top: 42%; bottom: 42%; left: 50%; width: 2px; background: #2196F3; transform: translateX(-50%);">
+                            </div>
+
+                            <div class="shop-marker selected" style="top: 50%; left: 50%;"></div>
+                            <div class="map-popup" style="top: 50%; left: 50%;">
+                                <span class="popup-name">🧋 CoCo</span>
+                            </div>
+                        </div>
+
+                        <div class="bottom-sheet" style="height: 45%;">
+                            <div class="sheet-handle">
+                                <div class="handle-bar"></div>
+                                <div class="sheet-header">
+                                    <span class="sheet-title">Boba Shops</span>
+                                    <span class="shop-count">12 found</span>
+                                </div>
+                            </div>
+                            <div class="shop-list">
+                                <div class="shop-card selected">
+                                    <div class="shop-name">CoCo</div>
+                                    <div class="shop-address">789 Tea Lane</div>
+                                </div>
+                                <div class="shop-card">
+                                    <div class="shop-name">Tiger Sugar</div>
+                                    <div class="shop-address">123 Main St</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="safari-footer">
+                        <span class="safari-btn">◀</span>
+                        <span class="safari-btn">▶</span>
+                        <span class="safari-btn">⬆︎</span>
+                        <span class="safari-btn">📖</span>
+                        <span class="safari-btn">☐☐</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-note">
+                ⚠️ Shop marker is at viewport center but hidden behind the sheet
+            </div>
+        </div>
+
+        <!-- Centering Fix -->
+        <div class="mockup-card">
+            <div class="mockup-title">✅ Fix: Use flyTo padding <span class="badge">Easy Fix</span></div>
+            <div class="mockup-desc">Set <code>padding: { bottom: sheetHeight }</code> to center in visible area</div>
+
+            <div class="iphone-frame">
+                <div class="iphone-screen">
+                    <div class="dynamic-island"></div>
+
+                    <div class="safari-header">
+                        <div class="safari-url-bar">
+                            <span class="lock">🔒</span> boba-seeker.com
+                        </div>
+                    </div>
+
+                    <div class="app-viewport">
+                        <div class="map-area">
+                            <div class="map-grid"></div>
+                            <div class="map-roads">
+                                <div class="road h1"></div>
+                                <div class="road h2"></div>
+                                <div class="road v1"></div>
+                                <div class="road v2"></div>
+                            </div>
+
+                            <!-- Visible area highlight -->
+                            <div
+                                style="position: absolute; top: 0; left: 3px; right: 3px; bottom: 45%; border: 2px dashed #4CAF50; background: rgba(76, 175, 80, 0.1); border-radius: 4px;">
+                                <span
+                                    style="position: absolute; top: 4px; left: 4px; background: #4CAF50; color: #fff; font-size: 7px; padding: 2px 5px; border-radius: 3px;">Visible
+                                    Area</span>
+                            </div>
+
+                            <!-- Center indicator for visible area -->
+                            <div
+                                style="position: absolute; top: 27%; left: 50%; width: 10px; height: 10px; border: 2px solid #4CAF50; border-radius: 50%; transform: translate(-50%, -50%);">
+                            </div>
+
+                            <div class="shop-marker selected" style="top: 27%; left: 50%;"></div>
+                            <div class="map-popup" style="top: 27%; left: 50%;">
+                                <span class="popup-name">🧋 CoCo</span>
+                            </div>
+
+                            <div class="shop-marker" style="top: 12%; left: 30%;"></div>
+                            <div class="shop-marker" style="top: 42%; left: 70%;"></div>
+                        </div>
+
+                        <div class="bottom-sheet" style="height: 45%;">
+                            <div class="sheet-handle">
+                                <div class="handle-bar"></div>
+                                <div class="sheet-header">
+                                    <span class="sheet-title">Boba Shops</span>
+                                    <span class="shop-count">12 found</span>
+                                </div>
+                            </div>
+                            <div class="shop-list">
+                                <div class="shop-card selected">
+                                    <div class="shop-name">CoCo</div>
+                                    <div class="shop-address">789 Tea Lane</div>
+                                </div>
+                                <div class="shop-card">
+                                    <div class="shop-name">Tiger Sugar</div>
+                                    <div class="shop-address">123 Main St</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="safari-footer">
+                        <span class="safari-btn">◀</span>
+                        <span class="safari-btn">▶</span>
+                        <span class="safari-btn">⬆︎</span>
+                        <span class="safari-btn">📖</span>
+                        <span class="safari-btn">☐☐</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-note">
+                ✅ Shop is centered in visible map area. Popup clearly visible!
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

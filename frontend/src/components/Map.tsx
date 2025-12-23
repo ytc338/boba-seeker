@@ -26,6 +26,7 @@ interface MapProps {
   showSearchButton?: boolean;
   onSearchClick?: () => void;
   searchLoading?: boolean;
+  bottomPadding?: number;
 }
 
 export default function Map({
@@ -36,6 +37,7 @@ export default function Map({
   showSearchButton = false,
   onSearchClick,
   searchLoading = false,
+  bottomPadding = 0,
 }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -247,6 +249,7 @@ export default function Map({
         center: [selectedShop.longitude, selectedShop.latitude],
         zoom: 15,
         duration: 1000,
+        padding: { bottom: bottomPadding, top: 0, left: 0, right: 0 },
       });
     }
   }, [selectedShop, mapReady]);

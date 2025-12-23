@@ -11,15 +11,20 @@
   transition: max-height 0.3s ease;
   display: flex;
   flex-direction: column;
-  max-height: 40vh;
+  max-height: 72px; /* collapsed by default */
 }
 
+/* 3 states for mobile */
 .bottom-sheet.collapsed {
   max-height: 72px;
 }
 
+.bottom-sheet.peek {
+  max-height: 25vh;
+}
+
 .bottom-sheet.expanded {
-  max-height: 70vh;
+  max-height: 55vh;
 }
 
 /* Handle area */
@@ -30,6 +35,12 @@
   padding: 12px 16px 8px;
   cursor: grab;
   flex-shrink: 0;
+  touch-action: none; /* Prevent scroll while dragging */
+  user-select: none;
+}
+
+.sheet-handle:active {
+  cursor: grabbing;
 }
 
 .handle-bar {
@@ -83,12 +94,14 @@
   }
 
   .bottom-sheet.collapsed,
+  .bottom-sheet.peek,
   .bottom-sheet.expanded {
     max-height: none;
   }
 
   .sheet-handle {
     cursor: default;
+    touch-action: auto;
   }
 
   .handle-bar {

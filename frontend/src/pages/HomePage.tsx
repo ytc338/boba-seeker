@@ -46,6 +46,9 @@ export default function HomePage() {
     minLat: number; maxLat: number; minLng: number; maxLng: number;
   } | null>(null);
   const [showSearchButton, setShowSearchButton] = useState(false);
+  
+  // Bottom sheet height for map padding
+  const [sheetHeight, setSheetHeight] = useState(0);
 
   // Fetch brands when region changes
   useEffect(() => {
@@ -174,6 +177,7 @@ export default function HomePage() {
           showSearchButton={showSearchButton}
           onSearchClick={handleSearchArea}
           searchLoading={loading}
+          bottomPadding={sheetHeight}
         />
       </div>
 
@@ -194,6 +198,7 @@ export default function HomePage() {
         onShopSelect={setSelectedShop}
         loading={loading}
         error={error}
+        onHeightChange={setSheetHeight}
       />
     </div>
   );
