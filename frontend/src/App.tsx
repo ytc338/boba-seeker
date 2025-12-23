@@ -6,19 +6,21 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app">
-        <header className="app-header">
+        <header className="app-header" role="banner">
           <Link to="/" className="logo">
-            <span className="logo-icon">🧋</span>
-            <span className="logo-text">Boba Seeker</span>
+            <span className="logo-icon" aria-hidden="true">🧋</span>
+            <h1 className="logo-text">Boba Seeker</h1>
           </Link>
-          <nav className="nav">
+          <nav className="nav" aria-label="Main navigation">
             <Link to="/" className="nav-link">Explore</Link>
           </nav>
         </header>
 
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-        </Routes>
+        <main role="main">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+          </Routes>
+        </main>
       </div>
     </BrowserRouter>
   );

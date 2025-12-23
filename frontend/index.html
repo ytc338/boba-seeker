@@ -3,14 +3,74 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary Meta Tags -->
+  <title>Boba Seeker - Find Bubble Tea Shops Near You</title>
+  <meta name="title" content="Boba Seeker - Find Bubble Tea Shops Near You" />
+  <meta name="description"
+    content="Discover the best boba and bubble tea shops in Taiwan, Singapore, and the US. Find nearby locations, ratings, and your favorite brands on an interactive map." />
+  <meta name="keywords" content="boba, bubble tea, milk tea, boba near me, taiwan tea, bubble tea shop, boba finder" />
+  <meta name="author" content="Boba Seeker" />
+
+  <!-- Favicon -->
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧋</text></svg>" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Boba Seeker</title>
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://boba-seeker-frontend.onrender.com/" />
+  <meta property="og:title" content="Boba Seeker - Find Bubble Tea Shops Near You" />
+  <meta property="og:description"
+    content="Discover the best boba and bubble tea shops in Taiwan, Singapore, and the US. Find nearby locations, ratings, and your favorite brands." />
+  <meta property="og:image" content="/og-image.png" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://boba-seeker-frontend.onrender.com/" />
+  <meta name="twitter:title" content="Boba Seeker - Find Bubble Tea Shops Near You" />
+  <meta name="twitter:description"
+    content="Discover the best boba and bubble tea shops in Taiwan, Singapore, and the US. Find nearby locations, ratings, and your favorite brands." />
+  <meta name="twitter:image" content="/og-image.png" />
+
+  <!-- Additional SEO -->
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#8B5A2B" />
+  <link rel="canonical" href="https://boba-seeker-frontend.onrender.com/" />
 </head>
 
 <body>
   <div id="root"></div>
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://boba-seeker-frontend.onrender.com/#website",
+          "url": "https://boba-seeker-frontend.onrender.com/",
+          "name": "Boba Seeker",
+          "description": "Find the best bubble tea and boba shops near you",
+          "inLanguage": "en-US"
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://boba-seeker-frontend.onrender.com/#organization",
+          "name": "Boba Seeker",
+          "url": "https://boba-seeker-frontend.onrender.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://boba-seeker-frontend.onrender.com/og-image.png"
+          },
+          "sameAs": []
+        }
+      ]
+    }
+  </script>
+
   <script type="module" src="/src/main.tsx"></script>
 </body>
 

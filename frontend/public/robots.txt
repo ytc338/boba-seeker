@@ -1,0 +1,11 @@
+# Boba Seeker robots.txt
+# https://bobaseeker.com
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://boba-seeker-frontend.onrender.com/sitemap.xml
+
+# Crawl-delay for politeness (optional)
+Crawl-delay: 1
