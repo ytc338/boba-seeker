@@ -1,0 +1,14 @@
+# Dockerfile for running backend tests
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install dependencies including test packages
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Default command runs tests
+CMD ["pytest", "-v", "--tb=short"]

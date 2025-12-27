@@ -1,0 +1,33 @@
+# Docker Compose for running tests
+# Usage:
+#   docker compose -f docker-compose.test.yml run --rm backend-test
+#   docker compose -f docker-compose.test.yml run --rm frontend-test
+#   docker compose -f docker-compose.test.yml up  # Run all tests
+
+services:
+  # Backend tests with pytest
+  backend-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+    container_name: boba-backend-test
+    volumes:
+      - ./backend:/app
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    command: pytest -v --tb=short --cov=app --cov-report=term-missing
+
+  # Frontend tests with Vitest
+  frontend-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.test
+    container_name: boba-frontend-test
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/vitest.config.ts:/app/vitest.config.ts
+      # Don't mount node_modules to use container's installed deps
+    environment:
+      - CI=true
+    command: npm test -- --run
