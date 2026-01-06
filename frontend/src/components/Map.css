@@ -143,3 +143,16 @@
   font-size: 18px;
   padding: 4px 8px;
 }
+
+.marker-popup-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #c2185b;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.marker-popup-link:hover {
+  text-decoration: underline;
+}

@@ -218,6 +218,15 @@ export default function Map({
     source.setData(geojson);
   }, [shops, mapReady]);
 
+  // Google Maps URL helper
+  const getGoogleMapsUrl = useCallback((shop: Shop): string => {
+    if (shop.google_place_id) {
+      return `https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${shop.google_place_id}`;
+    }
+    const query = encodeURIComponent(`${shop.name} ${shop.address}`);
+    return `https://www.google.com/maps/search/?api=1&query=${query}`;
+  }, []);
+
   // Update selected marker and show popup
   useEffect(() => {
     if (!map.current || !mapReady) return;
@@ -234,6 +243,8 @@ export default function Map({
     }
 
     if (selectedShop) {
+      const mapsUrl = getGoogleMapsUrl(selectedShop);
+      
       popup.current = new mapboxgl.Popup({ offset: 15, closeButton: true })
         .setLngLat([selectedShop.longitude, selectedShop.latitude])
         .setHTML(
@@ -241,6 +252,9 @@ export default function Map({
             <h4>${selectedShop.name}</h4>
             <p>${selectedShop.address}</p>
             ${selectedShop.rating ? `<p>★ ${selectedShop.rating.toFixed(1)}</p>` : ''}
+            <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="marker-popup-link">
+              View on Google Maps ↗
+            </a>
           </div>`
         )
         .addTo(map.current);
@@ -252,7 +266,7 @@ export default function Map({
         padding: { bottom: bottomPadding, top: 0, left: 0, right: 0 },
       });
     }
-  }, [selectedShop, mapReady]);
+  }, [selectedShop, mapReady, getGoogleMapsUrl, bottomPadding]);
 
   // Locate user function
   const locateUser = useCallback(() => {
