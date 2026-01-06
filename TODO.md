@@ -11,6 +11,7 @@
 - [x] Backend API (FastAPI + SQLite)
 - [x] Docker containerization
 - [x] Seed data for initial shops
+- [x] Singapore location data
 - [x] Drink recommendations component
 
 ---
@@ -19,7 +20,7 @@
 
 These are blockers for real daily use.
 
-- [ ] **Real shop data import** - Import actual Taiwan boba shops via Google Places API
+- [x] **Real shop data import** - Import actual Taiwan boba shops via Google Places API
 - [ ] **Directions button** - "Open in Google Maps" when viewing a shop
 - [ ] **Search by name** - Quick search for shop/brand names
 - [ ] **Shop detail panel** - View hours, phone, address, rating on click
@@ -44,7 +45,7 @@ Makes daily use smoother.
 
 Once it works well for you, share with others.
 
-- [ ] **US location data** - Add major US cities (LA, SF, NYC)
+- [x] **US location data** - Add major US cities (LA, SF, NYC)
 - [ ] **Mobile responsiveness** - Bottom sheet, collapsible sidebar
 - [ ] **Share shop** - Copy link to specific shop
 - [ ] **Language toggle** - English/Chinese interface

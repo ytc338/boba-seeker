@@ -55,6 +55,10 @@ NATIONAL_BRANDS = [
     {"name": "Chicha San Chen", "name_zh": "吃茶三千", "aliases": ["ChiCha"], "origin_country": "TW"},
     {"name": "7 Leaves Cafe", "name_zh": "7 Leaves", "aliases": ["Seven Leaves"], "origin_country": "US"},
     {"name": "Sunright Tea Studio", "name_zh": "日青良月", "aliases": ["Sunright"], "origin_country": "US"},
+    {"name": "Feng Cha Teahouse", "name_zh": "奉茶", "aliases": ["Feng Cha"], "origin_country": "CN"},
+    {"name": "Moge Tee", "name_zh": "愿茶", "aliases": [], "origin_country": "CN"},
+    {"name": "Meet Fresh", "name_zh": "鮮芋仙", "aliases": [], "origin_country": "TW"},
+    {"name": "Wushiland Boba", "name_zh": "50嵐", "aliases": ["OO Tea", "50 Lan"], "origin_country": "TW"},
 ]
 
 # ============================================================
@@ -62,15 +66,12 @@ NATIONAL_BRANDS = [
 # ============================================================
 REGIONAL_BRANDS = {
     "SoCal": [  # LA, San Diego, Orange County
-        {"name": "Wushiland Boba", "name_zh": "50嵐", "aliases": ["OO Tea", "50 Lan"], "origin_country": "TW"},
         {"name": "Bopomofo Cafe", "name_zh": "Bopomofo", "aliases": [], "origin_country": "US"},
         {"name": "OMOMO Tea Shoppe", "name_zh": "OMOMO", "aliases": ["OMOMO"], "origin_country": "TW"},
         {"name": "Factory Tea Bar", "name_zh": "Factory Tea", "aliases": [], "origin_country": "US"},
         {"name": "Tea Maru", "name_zh": "Tea Maru", "aliases": [], "origin_country": "US"},
         {"name": "Tastea", "name_zh": "Tastea", "aliases": [], "origin_country": "US"},
         {"name": "Molly Tea", "name_zh": "Molly Tea", "aliases": ["Molly"], "origin_country": "TW"},
-        {"name": "Moge Tee", "name_zh": "愿茶", "aliases": [], "origin_country": "CN"},
-        {"name": "Feng Cha Teahouse", "name_zh": "奉茶", "aliases": ["Feng Cha"], "origin_country": "CN"},
         {"name": "3CAT Tea", "name_zh": "3CAT", "aliases": ["3 Cat"], "origin_country": "US"},
         {"name": "DaYung's Tea", "name_zh": "大苑子", "aliases": ["Da Yung"], "origin_country": "TW"},
         {"name": "Camellia Tea Bar", "name_zh": "Camellia", "aliases": ["Camellia Rd"], "origin_country": "US"},
@@ -101,6 +102,27 @@ REGIONAL_BRANDS = {
         {"name": "Wanpo Tea Shop", "name_zh": "萬波", "aliases": ["Wanpo"], "origin_country": "TW"},
         {"name": "Vivi Bubble Tea", "name_zh": "ViVi", "aliases": ["Vivi"], "origin_country": "US"},
     ],
+    "Hawaii": [  # Honolulu
+        {"name": "Taste Tea", "name_zh": "Taste Tea", "aliases": [], "origin_country": "US"},
+        {"name": "Teapresso Bar", "name_zh": "Teapresso", "aliases": [], "origin_country": "US"},
+        {"name": "Mr. Tea Cafe", "name_zh": "Mr. Tea", "aliases": [], "origin_country": "US"},
+        {"name": "Hana Tea", "name_zh": "Hana Tea", "aliases": [], "origin_country": "US"},
+        {"name": "Thang's French Coffee & Bubble Tea", "name_zh": "Thang's", "aliases": [], "origin_country": "US"},
+    ],
+    "Texas": [  # Houston, Dallas
+        {"name": "The Teahouse", "name_zh": "The Teahouse", "aliases": [], "origin_country": "US"},
+        {"name": "Tea Top", "name_zh": "Tea Top", "aliases": [], "origin_country": "TW"},
+        {"name": "Star Snow Ice", "name_zh": "Star Snow", "aliases": [], "origin_country": "US"},
+        {"name": "Mr. Wish", "name_zh": "Mr. Wish", "aliases": [], "origin_country": "TW"},
+    ],
+    "Midwest": [  # Chicago
+        {"name": "Joy Yee", "name_zh": "Joy Yee", "aliases": [], "origin_country": "US"},
+        {"name": "Uni Uni", "name_zh": "Uni Uni", "aliases": [], "origin_country": "US"},
+        {"name": "Te'Amo Boba Bar", "name_zh": "Te'Amo", "aliases": [], "origin_country": "US"},
+        {"name": "Hello Jasmine", "name_zh": "Hello Jasmine", "aliases": [], "origin_country": "US"},
+        {"name": "Tsaocaa", "name_zh": "Tsaocaa", "aliases": [], "origin_country": "CN"},
+        {"name": "Saint's Alp Teahouse", "name_zh": "Saint's Alp", "aliases": [], "origin_country": "HK"},
+    ],
 }
 
 # City to Region mapping
@@ -110,10 +132,9 @@ CITY_REGIONS = {
     "Bay Area": "NorCal",
     "Seattle": "PNW",
     "New York City": "Northeast",
-    # Future cities
+    "Honolulu": "Hawaii",
     "Houston": "Texas",
     "Chicago": "Midwest",
-    "Honolulu": "Hawaii",
 }
 
 # ============================================================
@@ -147,6 +168,34 @@ CITY_GRIDS = {
         {"name": "Koreatown NYC", "lat": 40.7475, "lng": -73.9872},
         {"name": "Sunset Park Brooklyn", "lat": 40.6453, "lng": -74.0124},
         {"name": "Elmhurst Queens", "lat": 40.7379, "lng": -73.8795},
+    ],
+    "Bay Area": [
+        {"name": "SF Downtown", "lat": 37.7876, "lng": -122.4066},
+        {"name": "SF Sunset/Richmond", "lat": 37.7634, "lng": -122.4781},
+        {"name": "Oakland/Berkeley", "lat": 37.8685, "lng": -122.2680},
+        {"name": "San Jose/Cupertino", "lat": 37.3190, "lng": -122.0250},
+        {"name": "Palo Alto", "lat": 37.4419, "lng": -122.1430},
+        {"name": "Fremont", "lat": 37.5485, "lng": -121.9886},
+    ],
+    "Honolulu": [
+        {"name": "Ala Moana", "lat": 21.2913, "lng": -157.8450},
+        {"name": "Waikiki", "lat": 21.2782, "lng": -157.8256},
+        {"name": "Kaka'ako", "lat": 21.2946, "lng": -157.8590},
+        {"name": "Kaimuki", "lat": 21.2806, "lng": -157.7981},
+        {"name": "University of Hawaii", "lat": 21.2989, "lng": -157.8174},
+    ],
+    "Houston": [
+        {"name": "Bellaire Chinatown", "lat": 29.7050, "lng": -95.5450},
+        {"name": "Katy Asian Town", "lat": 29.7890, "lng": -95.7830},
+        {"name": "Sugar Land", "lat": 29.5950, "lng": -95.6210},
+    ],
+    "Chicago": [
+        {"name": "Chinatown", "lat": 41.8525, "lng": -87.6322},
+        {"name": "Uptown Argyle", "lat": 41.9680, "lng": -87.6565},
+        {"name": "Lincoln Park", "lat": 41.9213, "lng": -87.6360},
+        {"name": "The Loop", "lat": 41.8781, "lng": -87.6298},
+        {"name": "Hyde Park", "lat": 41.7919, "lng": -87.5828},
+        {"name": "Evanston", "lat": 42.0450, "lng": -87.6810},
     ],
 }
 
@@ -407,7 +456,7 @@ async def import_city(service, db, city: str, session_place_ids: set, discover: 
 
 
 def sync_to_database(target_url: str):
-    """Sync all US shops to production."""
+    """Sync all US shops to production with optimized bulk checks."""
     from sqlalchemy import create_engine, text
     from sqlalchemy.orm import sessionmaker
     
@@ -426,38 +475,70 @@ def sync_to_database(target_url: str):
         
         us_shops = source_db.query(Shop).filter(Shop.country == "US").all()
         brand_ids = set(s.brand_id for s in us_shops if s.brand_id)
-        brands = source_db.query(Brand).filter(Brand.id.in_(brand_ids)).all()
+        local_brands = source_db.query(Brand).filter(Brand.id.in_(brand_ids)).all()
         
-        # Sync brands
-        brand_map = {}
-        for b in brands:
-            existing = target_db.query(Brand).filter(Brand.name == b.name).first()
-            if existing:
-                brand_map[b.id] = existing.id
+        # 1. OPTIMIZED BRAND SYNC: Fetch all existing target brands once
+        target_brands = target_db.query(Brand).all()
+        brand_map_by_name = {b.name: b.id for b in target_brands}
+        brand_id_map = {} # Maps local_id -> target_id
+        
+        brands_added = 0
+        for b in local_brands:
+            if b.name in brand_map_by_name:
+                brand_id_map[b.id] = brand_map_by_name[b.name]
             else:
-                new = Brand(name=b.name, name_zh=b.name_zh, description=b.description, origin_country=b.origin_country)
+                new = Brand(
+                    name=b.name, 
+                    name_zh=b.name_zh, 
+                    description=b.description, 
+                    origin_country=b.origin_country
+                )
                 target_db.add(new)
-                target_db.flush()
-                brand_map[b.id] = new.id
-        target_db.commit()
+                target_db.flush() # Get the new ID
+                brand_id_map[b.id] = new.id
+                brand_map_by_name[b.name] = new.id
+                brands_added += 1
         
-        # Sync shops
+        target_db.commit()
+        if brands_added:
+            print(f"✅ Created {brands_added} new brands")
+
+        # 2. OPTIMIZED SHOP SYNC: Fetch ALL existing Google Place IDs from target once
+        print("🔍 Checking for existing shops in target...")
+        existing_target_ids = {
+            id[0] for id in target_db.query(Shop.google_place_id).filter(Shop.google_place_id.isnot(None)).all()
+        }
+        
         added = 0
+        skipped = 0
         for s in us_shops:
-            if s.google_place_id:
-                exists = target_db.query(Shop).filter(Shop.google_place_id == s.google_place_id).first()
-                if exists:
-                    continue
+            if s.google_place_id and s.google_place_id in existing_target_ids:
+                skipped += 1
+                continue
+            
             target_db.add(Shop(
-                name=s.name, brand_id=brand_map.get(s.brand_id),
-                address=s.address, city=s.city, country=s.country,
-                latitude=s.latitude, longitude=s.longitude,
-                google_place_id=s.google_place_id, status=s.status,
-                last_verified=s.last_verified, created_at=s.created_at,
+                name=s.name, 
+                brand_id=brand_id_map.get(s.brand_id),
+                address=s.address, 
+                city=s.city, 
+                country=s.country,
+                latitude=s.latitude, 
+                longitude=s.longitude,
+                google_place_id=s.google_place_id, 
+                status=s.status,
+                last_verified=s.last_verified, 
+                created_at=s.created_at,
             ))
             added += 1
+            
+            # Commit in batches for very large imports
+            if added % 100 == 0:
+                target_db.flush()
+
         target_db.commit()
+        print(f"✅ Sync complete: {added} added, {skipped} skipped.")
         
+        # Reset sequences for PostgreSQL
         target_db.execute(text("SELECT setval('brands_id_seq', COALESCE((SELECT MAX(id) FROM brands), 1), true)"))
         target_db.execute(text("SELECT setval('shops_id_seq', COALESCE((SELECT MAX(id) FROM shops), 1), true)"))
         target_db.commit()

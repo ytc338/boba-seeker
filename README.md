@@ -1,6 +1,18 @@
 # Boba Seeker
 
-A boba tea shop directory for Taiwan and the US.
+A boba tea shop directory for Taiwan, Singapore, and the US.
+
+## 🌍 Service Coverage
+
+- **Taiwan** 🇹🇼: Nationwide coverage
+- **Singapore** 🇸🇬: Nationwide coverage
+- **United States** 🇺🇸:
+  - **California**: Los Angeles (SGV, OC), Bay Area, San Diego
+  - **New York**: New York City (Manhattan, Queens, Brooklyn)
+  - **Washington**: Seattle, Bellevue
+  - **Texas**: Houston
+  - **Illinois**: Chicago
+  - **Hawaii**: Honolulu
 
 ## Quick Start with Docker (Recommended)
 
