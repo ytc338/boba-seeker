@@ -7,7 +7,7 @@ import BottomSheet from '../components/BottomSheet';
 import './HomePage.css';
 
 // Default center: Taipei
-const DEFAULT_CENTER = { lat: 25.03, lng: 121.5 };
+const DEFAULT_CENTER = { lat: 40.74, lng: -74.98 };
 
 // Helper to detect region from coordinates
 function detectRegion(lat: number, lng: number): string {

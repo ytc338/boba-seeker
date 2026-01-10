@@ -8,7 +8,7 @@ import './Map.css';
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
 // Default location: Taipei, Taiwan
-const DEFAULT_CENTER: [number, number] = [121.5, 25.03];
+const DEFAULT_CENTER: [number, number] = [40.74, -74.98];
 const DEFAULT_ZOOM = 13;
 
 interface MapBounds {
