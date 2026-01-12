@@ -27,6 +27,7 @@ interface MapProps {
   onSearchClick?: () => void;
   searchLoading?: boolean;
   bottomPadding?: number;
+  highlightedShopId?: number | null;
 }
 
 export default function Map({
@@ -38,6 +39,7 @@ export default function Map({
   onSearchClick,
   searchLoading = false,
   bottomPadding = 0,
+  highlightedShopId = null,
 }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -102,6 +104,20 @@ export default function Map({
             'circle-stroke-width': 2,
             'circle-stroke-color': '#ffffff',
           },
+        });
+
+        // Highlight layer for roulette animation
+        map.current.addLayer({
+          id: 'shop-markers-highlighted',
+          type: 'circle',
+          source: 'shops',
+          paint: {
+            'circle-radius': 14,
+            'circle-color': '#ffb300', // Gold/Yellow for "jumping"
+            'circle-stroke-width': 4,
+            'circle-stroke-color': '#ffffff',
+          },
+          filter: ['==', ['get', 'id'], -1], // Initially hide
         });
 
         // Highlight layer for selected marker
@@ -226,6 +242,17 @@ export default function Map({
     const query = encodeURIComponent(`${shop.name} ${shop.address}`);
     return `https://www.google.com/maps/search/?api=1&query=${query}`;
   }, []);
+
+// Update highlighted marker (roulette animation)
+  useEffect(() => {
+    if (!map.current || !mapReady) return;
+
+    map.current.setFilter('shop-markers-highlighted', [
+      '==',
+      ['get', 'id'],
+      highlightedShopId ?? -1,
+    ]);
+  }, [highlightedShopId, mapReady]);
 
   // Update selected marker and show popup
   useEffect(() => {

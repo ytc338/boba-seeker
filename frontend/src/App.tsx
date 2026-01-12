@@ -12,7 +12,7 @@ function App() {
             <h1 className="logo-text">Boba Seeker</h1>
           </Link>
           <nav className="nav" aria-label="Main navigation">
-            <Link to="/" className="nav-link">Explore</Link>
+            <Link to="/?action=explore" className="nav-link">Feeling Lucky</Link>
           </nav>
         </header>
 

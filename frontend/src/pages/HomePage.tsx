@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { Shop, Brand } from '../types';
 import { getNearbyShops, getBrands } from '../services/api';
 import Map from '../components/Map';
 import FilterPanel from '../components/FilterPanel';
 import BottomSheet from '../components/BottomSheet';
+import RouletteOverlay from '../components/RouletteOverlay';
 import './HomePage.css';
 
 // Default center: Taipei
@@ -49,6 +51,12 @@ export default function HomePage() {
   
   // Bottom sheet height for map padding
   const [sheetHeight, setSheetHeight] = useState(0);
+
+  // Roulette state
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [rouletteState, setRouletteState] = useState<'idle' | 'spinning'>('idle');
+  const [highlightedShopId, setHighlightedShopId] = useState<number | null>(null);
 
   // Fetch brands when region changes
   useEffect(() => {
@@ -165,8 +173,111 @@ export default function HomePage() {
     setSelectedBrands([]);
   };
 
+  // Roulette Logic
+  const startRoulette = useCallback(() => {
+    // Only pick from shops currently visible on the map
+    let visibleShops = filteredShops;
+    if (mapBounds) {
+      visibleShops = filteredShops.filter(shop => 
+        shop.latitude >= mapBounds.minLat && 
+        shop.latitude <= mapBounds.maxLat && 
+        shop.longitude >= mapBounds.minLng && 
+        shop.longitude <= mapBounds.maxLng
+      );
+    }
+
+    if (visibleShops.length === 0) {
+      alert('No boba shops visible in this area! Try zooming out or panning to a different spot.');
+      return;
+    }
+
+    setRouletteState('spinning');
+    setSelectedShop(null); // Clear selection
+
+    // Animation settings
+    const duration = 2000; // 2 seconds spin
+    const intervalTime = 100; // Switch every 100ms
+    const startTime = Date.now();
+
+    /**
+     * Sets up an interval that continuously highlights random shops from the visible set
+     * until the specified duration expires, then selects a winner shop.
+     * 
+     * @remarks
+     * - Highlights a random shop from the visible shops on each interval tick
+     * - Checks elapsed time against the specified duration
+     * - Clears the interval and selects a final winner when time expires
+     * - Triggers a map flyTo animation via the Map component's setSelectedShop listener
+     * 
+     * @param visibleShops - Array of shop objects to randomly select from
+     * @param startTime - Timestamp (in ms) when the roulette started
+     * @param duration - Total duration (in ms) the roulette should run
+     * @param intervalTime - Time (in ms) between each shop highlight change
+     * @param setHighlightedShopId - State setter for the currently highlighted shop ID
+     * @param setRouletteState - State setter for the roulette state ('idle' when finished)
+     * @param setSelectedShop - State setter for the final selected/winning shop
+     */
+    const intervalId = setInterval(() => {
+      // Pick random shop from visible set to highlight
+      const randomIndex = Math.floor(Math.random() * visibleShops.length);
+      setHighlightedShopId(visibleShops[randomIndex].id);
+
+      // Check if time is up
+      if (Date.now() - startTime >= duration) {
+        clearInterval(intervalId);
+        
+        // Pick winner from visible set
+        const winnerIndex = Math.floor(Math.random() * visibleShops.length);
+        const winner = visibleShops[winnerIndex];
+        
+        setHighlightedShopId(null);
+        setRouletteState('idle');
+        setSelectedShop(winner); // This triggers map flyTo in Map component
+      }
+    }, intervalTime);
+
+    return () => clearInterval(intervalId);
+  }, [filteredShops, mapBounds]);
+
+  // Listen for URL param ?action=explore
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('action') === 'explore') {
+      // Remove param without reload
+      navigate(location.pathname, { replace: true });
+      
+      // Start roulette if shops are loaded, otherwise wait or retry
+      if (!loading) {
+         startRoulette();
+      } else {
+         // If loading, we could wait or just ignore. 
+         // For now, let's retry once after a short delay if filteredShops has data?
+         // Simpler: Just rely on user clicking again if it fails during load.
+         // Or: add simple check.
+         const checkLoaded = setInterval(() => {
+             if (!loading && shops.length > 0) {
+                 clearInterval(checkLoaded);
+                 startRoulette();
+             }
+         }, 500);
+         // Timeout after 5s
+         setTimeout(() => clearInterval(checkLoaded), 5000);
+      }
+    }
+  }, [location, navigate, startRoulette, loading, shops.length]);
+
   return (
     <div className="home-page map-first">
+      {/* Roulette Overlay */}
+      <RouletteOverlay 
+        isSpinning={rouletteState === 'spinning'} 
+        currentShopName={
+          highlightedShopId 
+            ? filteredShops.find(s => s.id === highlightedShopId)?.name 
+            : undefined
+        } 
+      />
+
       {/* Full-screen Map */}
       <div className="map-container">
         <Map
@@ -178,6 +289,7 @@ export default function HomePage() {
           onSearchClick={handleSearchArea}
           searchLoading={loading}
           bottomPadding={sheetHeight}
+          highlightedShopId={highlightedShopId}
         />
       </div>
 

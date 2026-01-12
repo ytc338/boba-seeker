@@ -1,0 +1,55 @@
+.roulette-overlay {
+  position: absolute;
+  top: 80px; /* Below header */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 12px 24px;
+  border-radius: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none; /* Let clicks pass through to map */
+  transition: all 0.3s ease;
+  border: 2px solid var(--primary-color, #e91e63);
+}
+
+.roulette-label {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.roulette-shop-name {
+  font-weight: 800;
+  color: var(--primary-color, #e91e63);
+  font-size: 1.1rem;
+  min-width: 150px;
+  text-align: center;
+}
+
+/* Spinner animation for the icon */
+.roulette-icon {
+  font-size: 1.2rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Pulse effect for the name */
+.roulette-shop-name.changing {
+  animation: pulse 0.1s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
