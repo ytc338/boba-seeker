@@ -32,3 +32,10 @@ export interface ShopListResponse {
   page: number;
   page_size: number;
 }
+
+export interface FeedbackCreate {
+  name?: string;
+  email?: string;
+  message: string;
+  type: string;
+}

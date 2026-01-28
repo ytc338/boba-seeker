@@ -50,4 +50,8 @@ export async function getBrands(country?: string): Promise<Brand[]> {
   return response.data;
 }
 
+export async function submitFeedback(data: import('../types').FeedbackCreate): Promise<void> {
+  await api.post('/api/feedback', data);
+}
+
 export default api;

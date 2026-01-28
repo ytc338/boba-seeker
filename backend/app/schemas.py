@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from typing import Optional
 
 
@@ -55,3 +56,16 @@ class ShopListResponse(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class FeedbackBase(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    message: str
+    type: Optional[str] = "contact"
+
+
+
+class FeedbackCreate(FeedbackBase):
+    pass
+

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import HomePage from './pages/HomePage';
+import ContactPage from './pages/ContactPage';
 import './App.css';
 
 function App() {
@@ -13,12 +14,14 @@ function App() {
           </Link>
           <nav className="nav" aria-label="Main navigation">
             <Link to="/?action=explore" className="nav-link">Feeling Lucky</Link>
+            <Link to="/contact" className="nav-link">Contact</Link>
           </nav>
         </header>
 
         <main role="main">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>
       </div>
