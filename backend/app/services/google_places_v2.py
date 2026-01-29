@@ -52,12 +52,13 @@ class GooglePlacesServiceV2:
         keyword: str = None,
         included_types: list[str] = None,
         radius_meters: int = 15000,
-        max_results: int = 20,
+        max_results: int = 60,
         country: str = "US"
     ) -> list[dict]:
         """
         Search for places near a location using the new API.
         Uses FieldMask to only request Pro-tier fields (cheapest).
+        Supports pagination.
         
         Args:
             lat: Latitude of search center
@@ -65,7 +66,7 @@ class GooglePlacesServiceV2:
             keyword: Text query to filter results (e.g., "boba tea", "Tiger Sugar")
             included_types: Place types to include (e.g., ["cafe", "restaurant"])
             radius_meters: Search radius (max 50000)
-            max_results: Max results to return (max 20 per request)
+            max_results: Max results to return (default 60)
             country: Country code for result parsing
             
         Returns:
@@ -74,54 +75,76 @@ class GooglePlacesServiceV2:
         if not self.api_key:
             return []
         
-        # Build request body
-        body = {
-            "locationRestriction": {
-                "circle": {
-                    "center": {
-                        "latitude": lat,
-                        "longitude": lng
-                    },
-                    "radius": float(radius_meters)
-                }
-            },
-            "maxResultCount": min(max_results, 20)  # API max is 20
-        }
+        all_shops = []
+        next_page_token = None
         
-        # Add keyword as text query if provided
-        if keyword:
-            body["textQuery"] = keyword
-        
-        # Add place types if provided
-        if included_types:
-            body["includedTypes"] = included_types
-        
-        # Add language for better results
-        body["languageCode"] = "en"
-        
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{self.BASE_URL}/places:searchNearby",
-                json=body,
-                headers={
-                    "Content-Type": "application/json",
-                    "X-Goog-Api-Key": self.api_key,
-                    "X-Goog-FieldMask": self.FIELD_MASK
+        while True:
+            remaining = max_results - len(all_shops)
+            if remaining <= 0:
+                break
+            
+            this_page_size = min(remaining, 20)
+            
+            # Build request body
+            body = {
+                "locationRestriction": {
+                    "circle": {
+                        "center": {
+                            "latitude": lat,
+                            "longitude": lng
+                        },
+                        "radius": float(radius_meters)
+                    }
                 },
-                timeout=30.0
-            )
+                "maxResultCount": this_page_size
+            }
             
-            if response.status_code != 200:
-                print(f"Nearby search error: {response.status_code} - {response.text}")
-                return []
+            # Add keyword as text query if provided
+            if keyword:
+                body["textQuery"] = keyword
             
-            data = response.json()
+            # Add place types if provided
+            if included_types:
+                body["includedTypes"] = included_types
             
-            shops = []
-            for place in data.get("places", []):
-                shops.append(self._parse_place(place, country))
+            # Add language for better results
+            body["languageCode"] = "en"
             
-            return shops
+            if next_page_token:
+                body["pageToken"] = next_page_token
+            
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{self.BASE_URL}/places:searchNearby",
+                    json=body,
+                    headers={
+                        "Content-Type": "application/json",
+                        "X-Goog-Api-Key": self.api_key,
+                        "X-Goog-FieldMask": self.FIELD_MASK + ",nextPageToken"
+                    },
+                    timeout=30.0
+                )
+                
+                if response.status_code != 200:
+                    print(f"Nearby search error: {response.status_code} - {response.text}")
+                    break
+                
+                data = response.json()
+                
+                current_batch = []
+                for place in data.get("places", []):
+                    current_batch.append(self._parse_place(place, country))
+                    
+                if not current_batch:
+                    break
+                    
+                all_shops.extend(current_batch)
+                
+                next_page_token = data.get("nextPageToken")
+                if not next_page_token:
+                    break
+            
+        return all_shops
     
     async def text_search(
         self,
@@ -129,19 +152,20 @@ class GooglePlacesServiceV2:
         lat: float = None,
         lng: float = None,
         radius_meters: int = 50000,
-        max_results: int = 20,
+        max_results: int = 60,
         country: str = "US"
     ) -> list[dict]:
         """
         Search for places by text query using the new API.
         Uses FieldMask to only request Pro-tier fields (cheapest).
+        Supports pagination (automatically fetches pages up to max_results).
         
         Args:
             query: Text query (e.g., "Boba Guys San Francisco")
             lat: Optional latitude to bias results
             lng: Optional longitude to bias results
             radius_meters: Search radius if lat/lng provided
-            max_results: Max results to return (max 20)
+            max_results: Max results to return (default 60)
             country: Country code for result parsing
             
         Returns:
@@ -150,47 +174,74 @@ class GooglePlacesServiceV2:
         if not self.api_key:
             return []
         
-        body = {
-            "textQuery": query,
-            "maxResultCount": min(max_results, 20),
-            "languageCode": "en"
-        }
+        all_shops = []
+        next_page_token = None
         
-        # Add location bias if coordinates provided
-        if lat is not None and lng is not None:
-            body["locationBias"] = {
-                "circle": {
-                    "center": {
-                        "latitude": lat,
-                        "longitude": lng
-                    },
-                    "radius": float(radius_meters)
-                }
+        while True:
+            # Calculate how many to ask for this page
+            remaining = max_results - len(all_shops)
+            if remaining <= 0:
+                break
+                
+            # API max page size is 20
+            this_page_size = min(remaining, 20)
+            
+            body = {
+                "textQuery": query,
+                "maxResultCount": this_page_size,
+                "languageCode": "en"
             }
-        
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{self.BASE_URL}/places:searchText",
-                json=body,
-                headers={
-                    "Content-Type": "application/json",
-                    "X-Goog-Api-Key": self.api_key,
-                    "X-Goog-FieldMask": self.FIELD_MASK
-                },
-                timeout=30.0
-            )
             
-            if response.status_code != 200:
-                print(f"Text search error: {response.status_code} - {response.text}")
-                return []
+            # Add pagination token if subsequent page
+            if next_page_token:
+                body["pageToken"] = next_page_token
             
-            data = response.json()
+            # Add location bias if coordinates provided
+            if lat is not None and lng is not None:
+                body["locationBias"] = {
+                    "circle": {
+                        "center": {
+                            "latitude": lat,
+                            "longitude": lng
+                        },
+                        "radius": float(radius_meters)
+                    }
+                }
             
-            shops = []
-            for place in data.get("places", []):
-                shops.append(self._parse_place(place, country))
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{self.BASE_URL}/places:searchText",
+                    json=body,
+                    headers={
+                        "Content-Type": "application/json",
+                        "X-Goog-Api-Key": self.api_key,
+                        "X-Goog-FieldMask": self.FIELD_MASK + ",nextPageToken"
+                    },
+                    timeout=30.0
+                )
+                
+                if response.status_code != 200:
+                    print(f"Text search error: {response.status_code} - {response.text}")
+                    break
+                
+                data = response.json()
+                
+                current_batch = []
+                for place in data.get("places", []):
+                    current_batch.append(self._parse_place(place, country))
+                
+                if not current_batch:
+                    # No results in this batch, usually means done
+                    break
+                    
+                all_shops.extend(current_batch)
+                
+                # Check for next page
+                next_page_token = data.get("nextPageToken")
+                if not next_page_token:
+                    break
             
-            return shops
+        return all_shops
     
     async def nearby_search_with_keyword(
         self,

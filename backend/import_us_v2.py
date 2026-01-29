@@ -20,9 +20,7 @@ Usage:
 import asyncio
 import argparse
 import sys
-import os
 from datetime import datetime, timezone
-from difflib import SequenceMatcher
 
 from dotenv import load_dotenv
 load_dotenv("../.env")
@@ -203,6 +201,9 @@ CITY_GRIDS = {
 # ============================================================
 # BRAND MATCHING UTILITIES
 # ============================================================
+# ============================================================
+# BRAND MATCHING UTILITIES
+# ============================================================
 def get_all_brands_for_city(city: str) -> list[dict]:
     """Get national + regional brands for a city."""
     brands = list(NATIONAL_BRANDS)
@@ -212,73 +213,7 @@ def get_all_brands_for_city(city: str) -> list[dict]:
     return brands
 
 
-def fuzzy_match_brand(shop_name: str, brands: list) -> tuple:
-    """
-    Match a shop name to a known brand using STRICT matching.
-    Returns (brand, confidence) or (None, 0).
-    
-    Rules:
-    - Exact brand name in shop name = match
-    - Chinese name exact match = match
-    - Generic words (boba, tea, bubble, milk) are NOT matched alone
-    - Multi-word brands require at least 2 words to match
-    """
-    shop_lower = shop_name.lower()
-    
-    # Words that are too generic to match alone
-    GENERIC_WORDS = {'boba', 'tea', 'bubble', 'milk', 'the', 'cafe', 'house', 'bar', 'shop'}
-    
-    for brand in brands:
-        brand_lower = brand.name.lower()
-        
-        # Check EXACT brand name in shop name (strongest match)
-        if brand_lower in shop_lower:
-            return (brand, 1.0)
-        
-        # Check Chinese name exact match
-        if brand.name_zh and brand.name_zh in shop_name:
-            return (brand, 1.0)
-        
-        # For multi-word brands, check if first two significant words match
-        brand_words = [w for w in brand_lower.split() if w not in GENERIC_WORDS]
-        if len(brand_words) >= 2:
-            # Need both significant words to appear
-            if all(word in shop_lower for word in brand_words[:2]):
-                return (brand, 0.95)
-        elif len(brand_words) == 1 and len(brand_words[0]) > 4:
-            # Single significant word brand (like "Sunright", "Sharetea")
-            # Must be a substantial match, not just substring
-            if brand_words[0] in shop_lower:
-                return (brand, 0.9)
-    
-    # No confident match found
-    return (None, 0)
-
-
-def match_brand_from_data(shop_name: str, brand_list: list[dict]) -> dict:
-    """Match shop name to brand data dict (not DB object)."""
-    shop_lower = shop_name.lower()
-    
-    for brand_data in brand_list:
-        # Check main name
-        if brand_data["name"].lower() in shop_lower:
-            return brand_data
-        
-        # Check first word
-        first_word = brand_data["name"].lower().split()[0]
-        if first_word in shop_lower and len(first_word) > 2:
-            return brand_data
-        
-        # Check Chinese name
-        if brand_data.get("name_zh") and brand_data["name_zh"] in shop_name:
-            return brand_data
-        
-        # Check aliases
-        for alias in brand_data.get("aliases", []):
-            if alias.lower() in shop_lower:
-                return brand_data
-    
-    return None
+from app.services.brand_matcher import find_best_brand_match, match_brand_from_name
 
 
 # ============================================================
@@ -322,7 +257,7 @@ async def import_brands_for_city(
                 shops_data = await service.text_search(
                     query=f"{brand.name} boba",
                     lat=point["lat"], lng=point["lng"],
-                    radius_meters=10000, max_results=20, country="US"
+                    radius_meters=10000, max_results=60, country="US"
                 )
             except Exception:
                 continue
@@ -337,8 +272,17 @@ async def import_brands_for_city(
                 
                 # Verify shop matches brand
                 shop_name = shop_data.get("name", "")
-                matched = match_brand_from_data(shop_name, [brand_data])
-                if not matched:
+                
+                # We are verifying against a specific target brand (brand_data)
+                # Check if it matches that specific brand
+                conf = match_brand_from_name(
+                    shop_name, 
+                    brand_data["name"], 
+                    brand_data.get("name_zh"), 
+                    brand_data.get("aliases")
+                )
+                
+                if conf < 0.9:
                     continue
                 
                 session_place_ids.add(place_id)
@@ -389,7 +333,7 @@ async def discovery_search(
             shops_data = await service.text_search(
                 query="boba tea",
                 lat=point["lat"], lng=point["lng"],
-                radius_meters=5000, max_results=20, country="US"
+                radius_meters=5000, max_results=60, country="US"
             )
         except Exception:
             continue
@@ -405,7 +349,25 @@ async def discovery_search(
             shop_name = shop_data.get("name", "")
             
             # Try to match to known brand
-            matched_brand, confidence = fuzzy_match_brand(shop_name, db_brands)
+            # Convert DB brands to dicts for the matcher
+            # Optimization: could do this once outside loop, but for now just map it
+            # actually strict types in find_best_brand_match expect dict access.
+            # Let's map db_brands to dicts
+            brand_dicts = [
+                {"name": b.name, "name_zh": b.name_zh, "aliases": []} # Aliases not in DB yet?
+                # Wait, new module relies on aliases. DB doesn't have aliases column usually?
+                # `import_us_v2.py` defined aliases in constants. DB `brands` table doesn't seem to have `aliases` column in `inspect_db` output.
+                # So we lose aliases here unless we merge with constants?
+                # The prompt asked to "take out BRAND_ALIASES... into a file". The `brand_matcher` has them.
+                # So `match_brand_from_name` inside `find_best_brand_match` will look them up from `BRAND_ALIASES` global in module if not provided!
+                # Perfect.
+                for b in db_brands
+            ]
+            
+            matched_data, confidence = find_best_brand_match(shop_name, brand_dicts)
+            
+            # Map back to DB object
+            matched_brand = next((b for b in db_brands if b.name == matched_data["name"]), None) if matched_data else None
             
             session_place_ids.add(place_id)
             

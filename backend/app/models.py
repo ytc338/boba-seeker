@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text, DateTime, Enum
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, UTC
 import enum
 
 from .database import Base
@@ -53,9 +53,8 @@ class Shop(Base):
     
     # Maintenance fields
     status = Column(String(20), default="active")  # active, closed, unverified
-    last_verified = Column(DateTime, default=datetime.utcnow)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_verified = Column(DateTime, default=datetime.now(UTC))
+    created_at = Column(DateTime, default=datetime.now(UTC))
+    updated_at = Column(DateTime, default=datetime.now(UTC), onupdate=datetime.now(UTC))
 
     brand = relationship("Brand", back_populates="shops")
-

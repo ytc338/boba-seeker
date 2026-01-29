@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """
-One-way sync from Source DB (.env) to Target DB (.env.prod).
+Smart Sync from Source DB (.env) to Target DB (.env.prod).
 
-Efficiency:
-    This script uses PostgreSQL's `INSERT ... ON CONFLICT DO UPDATE` (Upsert).
-    This is efficient because:
-    1. It minimizes network round-trips by sending data in batches rather than row-by-row.
-    2. It avoids the need to pre-query the database to check for existence (SELECT then INSERT/UPDATE).
-    3. The database engine handles the conflict resolution internally using indexes (B-Trees), which is much faster than application-level logic.
-    4. By only updating when data actually changes (optional optimization) or blindly updating, it ensures consistency with a single atomic operation per batch.
+Features:
+1.  **Brand Sync**: Matches by `name`. Maps Source IDs to Target IDs correctly, handling mismatched sequences.
+2.  **Shop Sync**: Matches by `google_place_id`. Uses the ID map to rewrite `brand_id` references before upserting.
+3.  **Conflict Resolution**: Uses `google_place_id` for Shops and `name` for Brands as the "Real" keys.
+4.  **Preserves Target IDs**: Does not overwrite the Primary Key (`id`) of existing rows in Target.
 
 Usage:
     python backend/sync_db.py [--dry-run]
@@ -34,7 +32,6 @@ from app.models import Brand, Shop, Base
 
 def get_db_url(env_file_name: str) -> str:
     """Extract DATABASE_URL from an env file without loading it into os.environ."""
-    # Assume script is in backend/sync_db.py, so project root is ../
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     env_path = os.path.join(base_dir, env_file_name)
     
@@ -48,64 +45,126 @@ def get_db_url(env_file_name: str) -> str:
     if not url:
         return None
     
-    # Fix Render's postgres:// if needed
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
         
     return url
 
-def sync_table(source_session, target_session, model, batch_size=1000, dry_run=False):
-    """Sync a single table from source to target using Upsert."""
-    table_name = model.__tablename__
-    print(f"\n📦 Syncing table: {table_name}")
+
+def sync_brands(source_session, target_session, dry_run=False) -> Dict[int, int]:
+    """
+    Sync Brands by NAME.
+    Returns a map of {Source_Brand_ID: Target_Brand_ID}.
+    """
+    print("\n📦 Syncing Table: Brands (Match by Name)")
     
-    # Get columns
-    columns = [c.name for c in model.__table__.columns]
+    source_brands = source_session.query(Brand).all()
+    if not source_brands:
+        print("   No brands in source.")
+        return {}
+
+    # columns to sync (exclude id)
+    columns = [c.name for c in Brand.__table__.columns if c.name != 'id']
     
-    # Identify Primary Key for conflict resolution
-    pk_columns = [c.name for c in model.__table__.primary_key.columns]
+    # Batch upsert
+    data_to_insert = []
+    for b in source_brands:
+        row = {col: getattr(b, col) for col in columns}
+        data_to_insert.append(row)
+        
+    if dry_run:
+        print(f"   [Dry Run] Would upsert {len(data_to_insert)} brands.")
+        # Return dummy map for dry run
+        return {b.id: b.id for b in source_brands}
     
-    # Count source rows
-    total_rows = source_session.query(model).count()
-    print(f"   Source has {total_rows} rows.")
+    # Perform Upsert
+    stmt = pg_insert(Brand).values(data_to_insert)
+    
+    # Update all columns except name (key) and id (pk)
+    update_dict = {col: stmt.excluded[col] for col in columns if col != 'name'}
+    
+    upsert_stmt = stmt.on_conflict_do_update(
+        index_elements=['name'], # Match on Name
+        set_=update_dict
+    )
+    
+    target_session.execute(upsert_stmt)
+    target_session.commit()
+    print(f"   ✅ Synced {len(data_to_insert)} brands.")
+    
+    # Re-build ID map
+    print("   🔄 Building ID Map (Source -> Target)...")
+    target_brands = target_session.query(Brand).all()
+    
+    # Map: Name -> TargetID
+    target_map = {b.name: b.id for b in target_brands}
+    
+    # Map: SourceID -> TargetID
+    id_map = {}
+    for b in source_brands:
+        if b.name in target_map:
+            id_map[b.id] = target_map[b.name]
+            
+    return id_map
+
+
+def sync_shops(source_session, target_session, brand_id_map: Dict[int, int], dry_run=False):
+    """
+    Sync Shops by GOOGLE_PLACE_ID.
+    Rewrite brand_id using the provided map.
+    """
+    print("\n📦 Syncing Table: Shops (Match by Google Place ID)")
+    
+    # Only sync shops that have a google_place_id (our logic relies on it)
+    query = source_session.query(Shop).filter(Shop.google_place_id.isnot(None))
+    total_rows = query.count()
+    print(f"   Source has {total_rows} matchable shops.")
     
     if total_rows == 0:
         return
 
-    processed = 0
-    query = source_session.query(model)
+    # columns to sync (exclude id)
+    columns = [c.name for c in Shop.__table__.columns if c.name != 'id']
     
-    # Fetch in batches
+    batch_size = 1000
+    processed = 0
+    
     for offset in range(0, total_rows, batch_size):
         batch = query.offset(offset).limit(batch_size).all()
         data_to_insert = []
         
         for obj in batch:
-            # Convert object to dict
-            row_data = {col: getattr(obj, col) for col in columns}
-            data_to_insert.append(row_data)
+            row = {col: getattr(obj, col) for col in columns}
+            
+            # Key Step: TRANSLATE BRAND ID
+            if row.get('brand_id'):
+                if row['brand_id'] in brand_id_map:
+                    row['brand_id'] = brand_id_map[row['brand_id']]
+                else:
+                    # Brand exists in Source but somehow missing in Target/Map?
+                    # Should set to None or Skip?
+                    # If sync_brands ran, it should be there.
+                    # Fallback to None to avoid FK constraint error
+                    row['brand_id'] = None
+            
+            data_to_insert.append(row)
         
         if not data_to_insert:
             break
             
         if dry_run:
-            print(f"   [Dry Run] Would upsert batch of {len(data_to_insert)} records.")
+            print(f"   [Dry Run] Would upsert batch of {len(data_to_insert)} shops.")
             processed += len(data_to_insert)
             continue
             
-        # Construct Upsert Statement
-        stmt = pg_insert(model).values(data_to_insert)
-        
-        # Create update dict: update all columns except PKs
-        update_dict = {col: stmt.excluded[col] for col in columns if col not in pk_columns}
-        
-        # Add timestamp if it exists and isn't being explicitly updated differently (optional)
-        # But here we want to sync exactly what is in source, so we stick to the source values.
-        
         # Perform Upsert
-        # ON CONFLICT (pk) DO UPDATE SET ...
+        stmt = pg_insert(Shop).values(data_to_insert)
+        
+        # Update all columns except google_place_id (key) and id (pk)
+        update_dict = {col: stmt.excluded[col] for col in columns if col != 'google_place_id'}
+        
         upsert_stmt = stmt.on_conflict_do_update(
-            index_elements=pk_columns,
+            index_elements=['google_place_id'],
             set_=update_dict
         )
         
@@ -115,10 +174,10 @@ def sync_table(source_session, target_session, model, batch_size=1000, dry_run=F
         processed += len(data_to_insert)
         print(f"   Progress: {processed}/{total_rows}")
 
+
 def update_sequences(target_session):
     """Update PostgreSQL sequences to match the highest ID."""
     print("\n🔧 Updating sequences...")
-    # List of tables to update sequences for
     tables = ['brands', 'shops']
     
     for table in tables:
@@ -131,10 +190,11 @@ def update_sequences(target_session):
     
     target_session.commit()
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Sync DB from .env (Source) to .env.prod (Target)")
-    parser.add_argument("--dry-run", action="store_true", help="Simulate sync without making changes")
-    parser.add_argument("--force", action="store_true", help="Bypass confirmation prompt")
+    parser = argparse.ArgumentParser(description="Smart Sync from Source to Target DB")
+    parser.add_argument("--dry-run", action="store_true", help="Simulate sync")
+    parser.add_argument("--force", action="store_true", help="Bypass confirmation")
     
     args = parser.parse_args()
     
@@ -142,20 +202,17 @@ def main():
     source_url = get_db_url(".env")
     target_url = get_db_url(".env.prod")
     
-    if not source_url:
-        print("❌ Error: Could not find DATABASE_URL in .env")
-        sys.exit(1)
-    if not target_url:
-        print("❌ Error: Could not find DATABASE_URL in .env.prod")
+    if not source_url or not target_url:
+        print("❌ Error: Missing DATABASE_URL in .env or .env.prod")
         sys.exit(1)
         
-    print(f"Source: {source_url.split('://')[1]}://... (from .env)")
-    print(f"Target: {target_url.split('://')[1]}://... (from .env.prod)")
+    print(f"Source: {source_url.split('://')[1]}://... (Development)")
+    print(f"Target: {target_url.split('://')[1]}://... (Production)")
     
     if args.dry_run:
-        print("\n🚧 DRY RUN MODE: No changes will be committed.")
+        print("\n🚧 DRY RUN MODE")
     elif not args.force:
-        confirm = input("\nAre you sure you want to overwrite/sync to Target? [y/N] ")
+        confirm = input("\nAre you sure you want to sync to Target? [y/N] ")
         if confirm.lower() != 'y':
             print("Aborted.")
             sys.exit(0)
@@ -171,12 +228,13 @@ def main():
     target_session = TargetSession()
     
     try:
-        # 3. Sync Tables
-        # Order matters due to Foreign Keys: Brand first, then Shop
-        sync_table(source_session, target_session, Brand, dry_run=args.dry_run)
-        sync_table(source_session, target_session, Shop, dry_run=args.dry_run)
+        # 3. Sync Brands & Get Map
+        id_map = sync_brands(source_session, target_session, dry_run=args.dry_run)
         
-        # 4. Update Sequences (Only if real run)
+        # 4. Sync Shops
+        sync_shops(source_session, target_session, id_map, dry_run=args.dry_run)
+        
+        # 5. Sequences
         if not args.dry_run:
             update_sequences(target_session)
             

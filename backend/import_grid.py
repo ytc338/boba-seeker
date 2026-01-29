@@ -30,8 +30,23 @@ sys.path.insert(0, ".")
 from app.database import SessionLocal, engine, Base
 from app.models import Brand, Shop
 from app.services.google_places import GooglePlacesService
+from app.services.brand_matcher import match_brand_from_name
 
-# Create/update tables (adds new columns)
+
+def get_or_create_brand(db, brand_data: dict) -> Brand:
+    """Get existing brand or create new one."""
+    brand = db.query(Brand).filter(Brand.name == brand_data["name"]).first()
+    if not brand:
+        brand = Brand(**brand_data)
+        db.add(brand)
+        db.flush()
+        print(f"  ✅ Created brand: {brand_data['name']}")
+    return brand
+
+
+def shop_exists(db, google_place_id: str) -> bool:
+    """Check if shop already exists by Google Place ID."""
+    return db.query(Shop).filter(Shop.google_place_id == google_place_id).first() is not None
 Base.metadata.create_all(bind=engine)
 
 # Priority brands
@@ -108,39 +123,7 @@ TAIWAN_GRID = [
     {"name": "Penghu", "lat": 23.5711, "lng": 119.5793},
 ]
 
-# Brand name variations for matching
-BRAND_ALIASES = {
-    "龜記": ["龜記", "Guiji", "GUIJI", "龜記茗品"],
-    "CoCo都可": ["CoCo", "都可", "coco"],
-    "50嵐": ["50嵐", "50 Lan", "五十嵐"],
-    "清心福全": ["清心", "清心福全"],
-    "一沐日": ["一沐日", "YIMU"],
-    "UG樂己": ["UG", "樂己", "UG樂己"],
-    "迷客夏": ["迷客夏", "Milksha"],
-    "五桐號": ["五桐號", "WooTea", "Woo Tea"],
-}
-
-
-def get_or_create_brand(db, brand_data: dict) -> Brand:
-    """Get existing brand or create new one."""
-    brand = db.query(Brand).filter(Brand.name == brand_data["name"]).first()
-    if not brand:
-        brand = Brand(**brand_data)
-        db.add(brand)
-        db.flush()
-        print(f"  ✅ Created brand: {brand_data['name']}")
-    return brand
-
-
-def shop_exists(db, google_place_id: str) -> bool:
-    """Check if shop already exists by Google Place ID."""
-    return db.query(Shop).filter(Shop.google_place_id == google_place_id).first() is not None
-
-
-def matches_brand(shop_name: str, brand_name: str) -> bool:
-    """Check if shop name matches the brand (including aliases)."""
-    aliases = [brand_name] + BRAND_ALIASES.get(brand_name, [])
-    return any(alias.lower() in shop_name.lower() for alias in aliases)
+from app.services.brand_matcher import match_brand_from_name
 
 
 def extract_city(lat: float, lng: float) -> str:
@@ -210,7 +193,9 @@ async def import_brand_grid(
             
             # Verify brand name matches
             shop_name = shop_data.get("name", "")
-            if not matches_brand(shop_name, brand.name):
+            # brand.name matches name in brand_data
+            conf = match_brand_from_name(shop_name, brand.name, brand.name_zh) 
+            if conf < 0.9:
                 skipped_name += 1
                 continue
             

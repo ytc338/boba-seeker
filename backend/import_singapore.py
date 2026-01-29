@@ -79,30 +79,7 @@ SINGAPORE_GRID = [
     {"name": "South (Harbourfront)", "lat": 1.2700, "lng": 103.8200},
 ]
 
-# Brand name variations for matching
-BRAND_ALIASES = {
-    "LiHO Tea": ["LiHO", "里喝", "Li Ho"],
-    "KOI Thé": ["KOI", "KOI The", "KOI茶"],
-    "Each A Cup": ["Each A Cup", "Each-A-Cup", "各一杯"],
-    "Gong Cha": ["Gong Cha", "貢茶", "GongCha"],
-    "ChiCha San Chen": ["ChiCha", "吃茶三千", "Chicha San Chen"],
-    "HEYTEA": ["HEYTEA", "喜茶", "Hey Tea"],
-    "Tiger Sugar": ["Tiger Sugar", "老虎堂"],
-    "Xing Fu Tang": ["Xing Fu Tang", "幸福堂", "XingFuTang"],
-    "The Alley": ["The Alley", "鹿角巷", "Alley"],
-    "Nayuki": ["Nayuki", "奈雪", "奈雪的茶", "Naixue"],
-    "Chagee": ["Chagee", "霸王茶姬", "CHAGEE"],
-    "R&B Tea": ["R&B", "R&B Tea", "R&B巡茶", "RB Tea"],
-    "Hollin": ["Hollin", "賀凜", "HOLLIN"],
-    "iTEA": ["iTEA", "iTea", "itea"],
-    "Milksha": ["Milksha", "迷客夏", "MILKSHA"],
-    "Sharetea": ["Sharetea", "歇腳亭", "Share Tea"],
-    "PlayMade": ["PlayMade", "Play Made", "Playmade"],
-    "KEBUKE": ["KEBUKE", "可不可", "Kebuke"],
-    "Yi Fang": ["Yi Fang", "一芳", "Yifang", "Yi Fang Taiwan Fruit Tea"],
-    "Bober Tea": ["Bober", "Bober Tea", "BOBER"],
-    "The Whale Tea": ["Whale Tea", "The Whale Tea", "大鯨魚"],
-}
+from app.services.brand_matcher import match_brand_from_name
 
 
 def get_or_create_brand(db, brand_data: dict) -> Brand:
@@ -121,12 +98,6 @@ def get_or_create_brand(db, brand_data: dict) -> Brand:
 def shop_exists(db, google_place_id: str) -> bool:
     """Check if shop already exists by Google Place ID."""
     return db.query(Shop).filter(Shop.google_place_id == google_place_id).first() is not None
-
-
-def matches_brand(shop_name: str, brand_name: str) -> bool:
-    """Check if shop name matches the brand (including aliases)."""
-    aliases = [brand_name] + BRAND_ALIASES.get(brand_name, [])
-    return any(alias.lower() in shop_name.lower() for alias in aliases)
 
 
 def extract_area(lat: float, lng: float) -> str:
@@ -329,7 +300,9 @@ async def import_brand_grid(
             
             # Verify brand name matches
             shop_name = shop_data.get("name", "")
-            if not matches_brand(shop_name, brand.name):
+            # brand.name matches name in brand_data
+            conf = match_brand_from_name(shop_name, brand.name, brand.name_zh)
+            if conf < 0.9:
                 skipped_name += 1
                 continue
             
