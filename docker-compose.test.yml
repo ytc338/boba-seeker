@@ -30,4 +30,4 @@ services:
       # Don't mount node_modules to use container's installed deps
     environment:
       - CI=true
-    command: npm test -- --run
+    command: bun run test

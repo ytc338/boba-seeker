@@ -1,18 +1,17 @@
 # Dockerfile for running frontend tests
-FROM node:20-alpine
+FROM oven/bun:1
 
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json bun.lockb* ./
 
 # Install all dependencies (including dev dependencies)
-# Using npm install instead of npm ci to handle new deps
-RUN npm install
+RUN bun install
 
 # Copy source code
 COPY . .
 
 # Default command runs tests
-CMD ["npm", "test", "--", "--run"]
+CMD ["bun", "run", "test"]
 

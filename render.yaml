@@ -22,7 +22,7 @@ services:
     name: boba-seeker-frontend
     runtime: static
     rootDir: frontend
-    buildCommand: npm ci && npm run build
+    buildCommand: npm install -g bun && bun install && bun run build
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
