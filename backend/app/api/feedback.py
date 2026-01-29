@@ -1,6 +1,8 @@
 import os
-import requests
+import smtplib
 import bleach
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from fastapi import APIRouter
 from ..schemas import FeedbackCreate
 
@@ -8,34 +10,48 @@ router = APIRouter()
 
 @router.post("", status_code=201)
 def create_feedback(feedback: FeedbackCreate):
-    """Submit feedback or contact message via Discord Webhook"""
-    webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
-    if not webhook_url:
-        print("Error: DISCORD_WEBHOOK_URL not configured")
-        # Return success to frontend to avoid user error, but log it
-        return {"status": "received", "note": "Webhook not configured"}
-
-    # Format message for Discord
-    content = f"**New {feedback.type.title()}**\n"
-    if feedback.name:
-        content += f"**Name:** {feedback.name}\n"
-    if feedback.email:
-        content += f"**Email:** {feedback.email}\n"
+    """Submit feedback or contact message via Gmail SMTP"""
+    smtp_user = os.environ.get("SMTP_USER")
+    smtp_password = os.environ.get("SMTP_PASSWORD")
     
-    # Sanitize message 
+    if not smtp_user or not smtp_password:
+        print("Error: SMTP_USER or SMTP_PASSWORD not configured")
+        return {"status": "received", "note": "Email not configured"}
+
+    # Sanitize inputs
     safe_message = bleach.clean(feedback.message, tags=[], strip=True)
-    content += f"\n{safe_message}"
+    safe_name = bleach.clean(feedback.name or "Anonymous", tags=[], strip=True)
+    safe_email = bleach.clean(feedback.email or "No Email Provided", tags=[], strip=True)
+    
+    # Email Content
+    subject = f"Boba Seeker Feedback: {feedback.type.title()}"
+    body = f"""
+    New Feedback Received:
+    
+    Type: {feedback.type.title()}
+    Name: {safe_name}
+    Email: {safe_email}
+    
+    Message:
+    {safe_message}
+    """
+
+    msg = MIMEMultipart()
+    msg['From'] = smtp_user
+    msg['To'] = smtp_user  # Send to self
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
 
     try:
-        response = requests.post(webhook_url, json={"content": content})
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        print(f"Failed to send to Discord: {e}")
-        if response.status_code == 429:
-            print(f"Rate Limit Headers: {response.headers}")
-            print(f"Response Body: {response.text}")
+        # Connect to Gmail SMTP
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.send_message(msg)
+        server.quit()
+        print(f"Email sent successfully to {smtp_user}")
     except Exception as e:
-        print(f"Failed to send to Discord: {e}")
-        # Still return success to frontend so user isn't confused
+        print(f"Failed to send email: {e}")
+        # Still return success to frontend
     
     return {"status": "sent"}
