@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
@@ -12,16 +12,16 @@ ENV VITE_MAPBOX_TOKEN=$VITE_MAPBOX_TOKEN
 ENV VITE_API_URL=$VITE_API_URL
 
 # Copy package files
-COPY package*.json ./
+COPY package.json bun.lockb* ./
 
-# Install dependencies (with BuildKit cache)
-RUN --mount=type=cache,target=/root/.npm npm ci
+# Install dependencies
+RUN bun install
 
 # Copy source code
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN bun run build
 
 # Production stage
 FROM nginx:alpine
