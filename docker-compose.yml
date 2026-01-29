@@ -8,6 +8,7 @@ services:
       - .env
     environment:
       - GOOGLE_PLACES_API_KEY=${GOOGLE_PLACES_API_KEY:-}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-}
     volumes:
       - ./backend:/app
       - backend_data:/app/data
