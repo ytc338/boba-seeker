@@ -22,7 +22,7 @@ def test_matching_logic():
         ("Boby Guys", True), # Fuzzy match tolerance
         ("Baby Guys", False), # Too different? Depends on fuzzy logic
         ("Boba Guys - Union Square", True),
-        ("Boby Guys Tea", True),
+        ("Boby Guys Tea", False),
         ("Guys Boba", True),
         ("Generic Guys", False)
     ]

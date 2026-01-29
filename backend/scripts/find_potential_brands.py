@@ -1,18 +1,19 @@
-
 import os
 import sys
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
-from rapidfuzz import fuzz, utils
 
 # Load env
-# Load env
-env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
-load_dotenv(env_path)
+# Use CWD for .env
+load_dotenv(os.path.join(os.getcwd(), ".env"))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Import from centralized service
+from app.services.brand_matcher import calculate_match_score, normalize_name
 
 def find_potential_brands():
     database_url = os.getenv("DATABASE_URL")
+    print(f"DEBUG: DATABASE_URL IS: {database_url}")
     if not database_url:
         print("DATABASE_URL not found")
         return
@@ -39,7 +40,7 @@ def find_potential_brands():
     
     for name in shop_names:
         # Simple normalization for the loop
-        name_clean = utils.default_process(name)
+        name_clean = normalize_name(name)
         if not name_clean:
             continue
             
@@ -47,7 +48,7 @@ def find_potential_brands():
         for cluster in clusters:
             # Check against representative
             # token_set_ratio is good for subset matches: "Gong Cha" vs "Gong Cha SJ" -> 100
-            score = fuzz.token_set_ratio(cluster['name'], name)
+            score = calculate_match_score(cluster['name'], name)
             
             if score >= 85: # Threshold
                 cluster['members'].append(name)

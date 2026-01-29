@@ -84,6 +84,25 @@ def get_aliases_for_brand(brand_name: str) -> list[str]:
     return BRAND_ALIASES.get(brand_name, [])
 
 
+from rapidfuzz import fuzz, utils
+
+def calculate_match_score(name1: str, name2: str) -> float:
+    """
+    Calculate fuzzy match score between two names using token set ratio.
+    Returns 0-100 score.
+    """
+    if not name1 or not name2:
+        return 0.0
+    return fuzz.token_set_ratio(name1, name2)
+
+
+def normalize_name(name: str) -> str:
+    """
+    Normalize a name using the standard processor (lowercase, trim, etc).
+    """
+    return utils.default_process(name)
+
+
 def match_brand_from_name(shop_name: str, brand_name: str, brand_name_zh: str = None, aliases: list = None) -> float:
     """
     Match a shop name to a brand.
@@ -114,26 +133,13 @@ def match_brand_from_name(shop_name: str, brand_name: str, brand_name_zh: str = 
         if alias.lower() in shop_lower:
             return 1.0
 
-    # 4. Fuzzy / Parts matching
-    brand_words = brand_lower.split()
-    if not brand_words:
-        return 0.0
-
-    first_word = brand_words[0]
-
-    # Strategy: Strong First Word
-    # e.g. "Starbucks" -> valid. "Boba" -> invalid.
-    if first_word not in GENERIC_WORDS and len(first_word) > 3:
-        if first_word in shop_lower:
-            return 0.9
-
-    # Strategy: Multi-word match
-    # e.g. "Yi Fang", "Boba Guys"
-    if len(brand_words) >= 2:
-        # Check first 2 words
-        second_word = brand_words[1]
-        if first_word in shop_lower and second_word in shop_lower:
-            return 0.95
+    # 4. Fuzzy Matching using RapidFuzz
+    # We use the centralized scoring function
+    score = calculate_match_score(brand_name, shop_name)
+    
+    if score >= 85:
+        # Normalize to 0.0-1.0 scale
+        return score / 100.0
             
     return 0.0
 
