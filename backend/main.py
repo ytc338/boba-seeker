@@ -14,7 +14,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Boba Seeker API",
     description="API for discovering boba tea shops in Taiwan and the US",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # CORS configuration
@@ -36,7 +36,7 @@ async def log_requests(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
     process_time = (time.time() - start_time) * 1000
-    
+
     logger.info(
         f"{request.method} {request.url.path} - "
         f"Status: {response.status_code} - "
@@ -48,6 +48,7 @@ async def log_requests(request: Request, call_next):
 @app.on_event("startup")
 async def startup_event():
     logger.info("Boba Seeker API starting up...")
+
 
 # Include routers
 app.include_router(shops.router, prefix="/api/shops", tags=["shops"])

@@ -16,39 +16,37 @@ def list_shops(
     country: Optional[str] = None,
     city: Optional[str] = None,
     brand_id: Optional[int] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """List all shops with pagination and filters"""
     query = db.query(Shop)
-    
+
     if country:
         query = query.filter(Shop.country == country)
     if city:
         query = query.filter(Shop.city == city)
     if brand_id:
         query = query.filter(Shop.brand_id == brand_id)
-    
+
     total = query.count()
     shops = query.offset((page - 1) * page_size).limit(page_size).all()
-    
-    return ShopListResponse(
-        shops=shops,
-        total=total,
-        page=page,
-        page_size=page_size
-    )
+
+    return ShopListResponse(shops=shops, total=total, page=page, page_size=page_size)
 
 
 @router.get("/search", response_model=list[ShopResponse])
 def search_shops(
     q: str = Query(..., min_length=1),
     limit: int = Query(10, ge=1, le=50),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Search shops by name or address"""
-    shops = db.query(Shop).filter(
-        (Shop.name.ilike(f"%{q}%")) | (Shop.address.ilike(f"%{q}%"))
-    ).limit(limit).all()
+    shops = (
+        db.query(Shop)
+        .filter((Shop.name.ilike(f"%{q}%")) | (Shop.address.ilike(f"%{q}%")))
+        .limit(limit)
+        .all()
+    )
     return shops
 
 
@@ -58,22 +56,28 @@ def nearby_shops(
     lng: float = Query(..., ge=-180, le=180),
     radius_km: float = Query(5, ge=0.1, le=50),
     limit: int = Query(500, ge=1, le=500),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Find shops near a location (simple distance calculation)"""
     import math
+
     # Simple bounding box filter (not perfect sphere distance)
     # 1 degree latitude ≈ 111km
     lat_delta = radius_km / 111
     # 1 degree longitude varies by latitude: 111km * cos(lat)
     cos_lat = math.cos(math.radians(lat)) if lat != 0 else 1
     lng_delta = radius_km / (111 * cos_lat)
-    
-    shops = db.query(Shop).filter(
-        Shop.latitude.between(lat - lat_delta, lat + lat_delta),
-        Shop.longitude.between(lng - lng_delta, lng + lng_delta)
-    ).limit(limit).all()
-    
+
+    shops = (
+        db.query(Shop)
+        .filter(
+            Shop.latitude.between(lat - lat_delta, lat + lat_delta),
+            Shop.longitude.between(lng - lng_delta, lng + lng_delta),
+        )
+        .limit(limit)
+        .all()
+    )
+
     return shops
 
 

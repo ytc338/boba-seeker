@@ -18,7 +18,7 @@ class BrandCreate(BrandBase):
 
 class BrandResponse(BrandBase):
     id: int
-    
+
     class Config:
         from_attributes = True
 
@@ -46,7 +46,7 @@ class ShopCreate(ShopBase):
 class ShopResponse(ShopBase):
     id: int
     brand: Optional[BrandResponse] = None
-    
+
     class Config:
         from_attributes = True
 
@@ -65,7 +65,5 @@ class FeedbackBase(BaseModel):
     type: Optional[str] = "contact"
 
 
-
 class FeedbackCreate(FeedbackBase):
     pass
-

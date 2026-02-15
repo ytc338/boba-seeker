@@ -19,6 +19,7 @@ from main import app
 # Database Fixtures
 # ============================================================================
 
+
 @pytest.fixture(scope="function")
 def test_engine():
     """Create an in-memory SQLite engine for testing."""
@@ -51,25 +52,26 @@ def client(test_engine, test_db):
     TestingSessionLocal = sessionmaker(
         autocommit=False, autoflush=False, bind=test_engine
     )
-    
+
     def override_get_db():
         db = TestingSessionLocal()
         try:
             yield db
         finally:
             db.close()
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     with TestClient(app) as test_client:
         yield test_client
-    
+
     app.dependency_overrides.clear()
 
 
 # ============================================================================
 # Sample Data Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def sample_brand(test_db) -> Brand:
@@ -79,7 +81,7 @@ def sample_brand(test_db) -> Brand:
         name_zh="測試珍珠",
         description="A test boba brand",
         origin_country="TW",
-        website="https://testboba.example.com"
+        website="https://testboba.example.com",
     )
     test_db.add(brand)
     test_db.commit()
@@ -95,19 +97,19 @@ def sample_brands(test_db) -> list[Brand]:
             name="Gong Cha",
             name_zh="貢茶",
             description="International boba chain",
-            origin_country="TW"
+            origin_country="TW",
         ),
         Brand(
             name="Tiger Sugar",
             name_zh="老虎堂",
             description="Famous for brown sugar boba",
-            origin_country="TW"
+            origin_country="TW",
         ),
         Brand(
             name="Boba Guys",
             name_zh="Boba Guys",
             description="SF-based artisan boba",
-            origin_country="US"
+            origin_country="US",
         ),
     ]
     for brand in brands:
@@ -206,6 +208,7 @@ def sample_shops(test_db, sample_brands) -> list[Shop]:
 # Mock Data for Google Places API
 # ============================================================================
 
+
 @pytest.fixture
 def mock_places_response():
     """Sample Google Places API (New) response."""
@@ -244,6 +247,6 @@ def mock_places_error_response():
         "error": {
             "code": 400,
             "message": "Invalid request",
-            "status": "INVALID_ARGUMENT"
+            "status": "INVALID_ARGUMENT",
         }
     }
