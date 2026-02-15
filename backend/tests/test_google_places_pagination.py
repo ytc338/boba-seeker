@@ -1,6 +1,6 @@
-import asyncio
 import os
 import sys
+
 import pytest
 
 # Add backend directory to path
@@ -30,13 +30,13 @@ async def test_pagination():
     print(f"📊 Found {count} results.")
 
     if count >= 20:
-        # Ideally we want > 20 to prove pagination, but sometimes exactly 20 returned if limit is 20
-        # If we asked for 60, we expect > 20 if more exist.
+        # Ideally we want > 20 to prove pagination, but sometimes exactly 20 returned
+        # if limit is 20. If we asked for 60, we expect > 20 if more exist.
         pass
     else:
         # It's possible fewer than 20 exist in 5km radius? Starbucks in NYC? Unlikely.
         # But asserting > 0 is safe.
         assert count > 0
 
-    # If we really want to verify pagination logic, we'd mock the client, containing next_page_token.
-    # For integration test, this is fine.
+    # If we really want to verify pagination logic, we'd mock the client,
+    # containing next_page_token. For integration test, this is fine.

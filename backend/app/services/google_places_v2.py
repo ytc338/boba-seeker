@@ -23,7 +23,9 @@ We explicitly EXCLUDE (Enterprise tier, costs extra):
 """
 
 import os
+
 import httpx
+
 from ..logger import logger
 
 
@@ -37,8 +39,12 @@ class GooglePlacesServiceV2:
 
     # MINIMAL Pro-tier fields only (cheapest)
     # All these are in Pro tier - no Enterprise charges
-    # Excludes: rating, userRatingCount, phone, hours, website, photos (Enterprise/extra cost)
-    FIELD_MASK = "places.id,places.displayName,places.formattedAddress,places.location,places.googleMapsUri"
+    # Excludes: rating, userRatingCount, phone, hours, website, photos
+    # (Enterprise/extra cost)
+    FIELD_MASK = (
+        "places.id,places.displayName,places.formattedAddress,"
+        "places.location,places.googleMapsUri"
+    )
 
     def __init__(self):
         self.api_key = os.getenv("GOOGLE_PLACES_API_KEY")

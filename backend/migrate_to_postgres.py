@@ -57,7 +57,6 @@ def migrate_data(sqlite_path: str, postgres_url: str, batch_size: int = 1000):
 
     try:
         # Create tables in PostgreSQL (import models to register them)
-        from app.models import Brand, Shop
         from app.database import Base
 
         print("🔨 Creating tables in PostgreSQL...")
@@ -145,7 +144,7 @@ def migrate_data(sqlite_path: str, postgres_url: str, batch_size: int = 1000):
                                     shop_dict[dt_field] = datetime.fromisoformat(
                                         shop_dict[dt_field].replace("Z", "+00:00")
                                     )
-                                except:
+                                except Exception:
                                     shop_dict[dt_field] = datetime.utcnow()
 
                     columns = ", ".join(shop_dict.keys())
@@ -161,30 +160,34 @@ def migrate_data(sqlite_path: str, postgres_url: str, batch_size: int = 1000):
                 except Exception as e:
                     pg_session.rollback()  # Rollback failed insert
                     print(
-                        f"   ⚠️  Error migrating shop {shop_dict.get('name', 'unknown')}: {e}"
+                        f"   ⚠️  Error migrating shop "
+                        f"{shop_dict.get('name', 'unknown')}: {e}"
                     )
                     skipped += 1
 
             offset += batch_size
             print(
-                f"   Progress: {min(offset, total_shops)}/{total_shops} (migrated: {migrated}, skipped: {skipped})"
+                f"   Progress: {min(offset, total_shops)}/{total_shops} "
+                f"(migrated: {migrated}, skipped: {skipped})"
             )
 
         # Update PostgreSQL sequences to avoid ID conflicts
         print("\n🔧 Updating ID sequences...")
         pg_session.execute(
             text("""
-            SELECT setval('brands_id_seq', COALESCE((SELECT MAX(id) FROM brands), 1), true)
+            SELECT setval('brands_id_seq',
+            COALESCE((SELECT MAX(id) FROM brands), 1), true)
         """)
         )
         pg_session.execute(
             text("""
-            SELECT setval('shops_id_seq', COALESCE((SELECT MAX(id) FROM shops), 1), true)
+            SELECT setval('shops_id_seq',
+            COALESCE((SELECT MAX(id) FROM shops), 1), true)
         """)
         )
         pg_session.commit()
 
-        print(f"\n✅ Migration complete!")
+        print("\n✅ Migration complete!")
         print(f"   Brands: {len(brands)}")
         print(f"   Shops migrated: {migrated}")
         print(f"   Shops skipped (duplicates): {skipped}")

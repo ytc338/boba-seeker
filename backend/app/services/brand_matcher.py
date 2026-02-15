@@ -3,6 +3,8 @@ Brand Matched Service
 Centralizes brand matching logic and aliases for various import scripts.
 """
 
+from rapidfuzz import fuzz, utils
+
 # ============================================================
 # BRAND CONFIGURAITON & ALIASES
 # ============================================================
@@ -94,9 +96,6 @@ BRAND_ALIASES = {
 def get_aliases_for_brand(brand_name: str) -> list[str]:
     """Get all aliases for a brand name."""
     return BRAND_ALIASES.get(brand_name, [])
-
-
-from rapidfuzz import fuzz, utils
 
 
 def calculate_match_score(name1: str, name2: str) -> float:

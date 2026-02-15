@@ -1,10 +1,11 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import Optional
 
 from ..database import get_db
 from ..models import Brand, Shop
-from ..schemas import BrandResponse, BrandCreate
+from ..schemas import BrandCreate, BrandResponse
 
 router = APIRouter()
 

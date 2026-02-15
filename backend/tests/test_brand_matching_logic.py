@@ -1,8 +1,12 @@
-import sys
 import os
+import sys
 
 # Add backend directory to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+
+# Import logic from service
+from app.services.brand_matcher import BRAND_ALIASES, match_brand_from_name
 
 
 # Mock objects
@@ -11,10 +15,6 @@ class MockBrand:
         self.name = name
         self.name_zh = name_zh
         self.aliases = []
-
-
-# Import logic from service
-from app.services.brand_matcher import match_brand_from_name, BRAND_ALIASES
 
 
 def test_matching_logic():

@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """
 Import real Taiwan boba shop data from Google Places API.
 
@@ -15,8 +16,8 @@ Usage:
     python import_places.py --clear
 """
 
-import asyncio
 import argparse
+import asyncio
 import sys
 from typing import Optional
 
@@ -28,7 +29,7 @@ load_dotenv("../.env")  # Load from project root
 # Add parent directory for imports
 sys.path.insert(0, ".")
 
-from app.database import SessionLocal, engine, Base
+from app.database import Base, SessionLocal, engine  # noqa: E402
 from app.models import Brand, Shop
 from app.services.google_places import GooglePlacesService
 
@@ -335,7 +336,8 @@ async def main():
             brands_to_import = [b for b in BRANDS if b["name"] in brand_filter]
 
         print(
-            f"\n📦 Importing {len(brands_to_import)} brand(s) across {len(city_filter)} city/cities"
+            f"\n📦 Importing {len(brands_to_import)} brand(s) across "
+            f"{len(city_filter)} city/cities"
         )
         print(f"   Brands: {', '.join(b['name'] for b in brands_to_import)}")
         print(f"   Cities: {', '.join(city_filter)}")
@@ -372,7 +374,7 @@ async def main():
         if not args.dry_run:
             brand_count = db.query(Brand).count()
             shop_count = db.query(Shop).count()
-            print(f"\n📊 Database now contains:")
+            print("\n📊 Database now contains:")
             print(f"   • {brand_count} brands")
             print(f"   • {shop_count} shops")
 

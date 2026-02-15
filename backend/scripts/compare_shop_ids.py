@@ -4,10 +4,11 @@ Compare Shop IDs between Dev and Prod databases.
 Finds shops where ID differs for the same google_place_id.
 """
 
-import sys
 import os
+import sys
+
 from dotenv import dotenv_values
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Add parent directory to path to allow importing app.models
@@ -104,7 +105,8 @@ def main():
         # 5. Report
         if not mismatches:
             print(
-                "\n✅ All shops with the same google_place_id have matching internal IDs."
+                "\n✅ All shops with the same google_place_id have matching "
+                "internal IDs."
             )
         else:
             if len(mismatches) == len(dev_set & prod_set):
@@ -119,7 +121,8 @@ def main():
             # for m in mismatches:
             #     if (m['dev_id'] - m['prod_id']) != diff:
             #         diff = m['dev_id'] - m['prod_id']
-            #         print(f"{m['google_place_id']:<30} | {m['dev_id']:<8} | {m['prod_id']:<8}")
+            #         print(f"{m['google_place_id']:<30} | {m['dev_id']:<8} | "
+            #               f"{m['prod_id']:<8}")
 
         # Also report orphans/exclusives if interesting?
         # User only asked: "I want to see the shop that the id doesn't match in to db."

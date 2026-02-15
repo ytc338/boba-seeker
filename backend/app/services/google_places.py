@@ -14,8 +14,9 @@ Usage:
 """
 
 import os
-import httpx
 from typing import Optional
+
+import httpx
 
 
 class GooglePlacesService:
@@ -25,7 +26,8 @@ class GooglePlacesService:
         self.api_key = os.getenv("GOOGLE_PLACES_API_KEY")
         if not self.api_key:
             print(
-                "Warning: GOOGLE_PLACES_API_KEY not set. Google Places features disabled."
+                "Warning: GOOGLE_PLACES_API_KEY not set. "
+                "Google Places features disabled."
             )
 
     async def search_boba_shops(
@@ -102,7 +104,8 @@ class GooglePlacesService:
 
             if data.get("status") not in ["OK", "ZERO_RESULTS"]:
                 print(
-                    f"Text search error: {data.get('status')} - {data.get('error_message', '')}"
+                    f"Text search error: {data.get('status')} - "
+                    f"{data.get('error_message', '')}"
                 )
                 return [], None
 
@@ -191,7 +194,8 @@ class GooglePlacesService:
 
             if data.get("status") not in ["OK", "ZERO_RESULTS"]:
                 print(
-                    f"Nearby search error: {data.get('status')} - {data.get('error_message', '')}"
+                    f"Nearby search error: {data.get('status')} - "
+                    f"{data.get('error_message', '')}"
                 )
                 return [], None
 
@@ -254,7 +258,10 @@ class GooglePlacesService:
                 f"{self.BASE_URL}/details/json",
                 params={
                     "place_id": place_id,
-                    "fields": "name,formatted_address,geometry,rating,user_ratings_total,formatted_phone_number,opening_hours,photos",
+                    "fields": (
+                        "name,formatted_address,geometry,rating,user_ratings_total,"
+                        "formatted_phone_number,opening_hours,photos"
+                    ),
                     "key": self.api_key,
                 },
             )
@@ -299,5 +306,8 @@ class GooglePlacesService:
         photos = place.get("photos", [])
         if photos and self.api_key:
             photo_ref = photos[0].get("photo_reference")
-            return f"{self.BASE_URL}/photo?maxwidth=400&photo_reference={photo_ref}&key={self.api_key}"
+            return (
+                f"{self.BASE_URL}/photo?maxwidth=400&photo_reference={photo_ref}"
+                f"&key={self.api_key}"
+            )
         return None

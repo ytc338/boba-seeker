@@ -1,6 +1,6 @@
-import sys
 import os
-import pytest
+import sys
+
 from fastapi.testclient import TestClient
 
 # Add backend directory to path

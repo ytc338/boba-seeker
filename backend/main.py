@@ -1,12 +1,12 @@
 import os
-from fastapi import FastAPI
+import time
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import shops, brands, feedback
-from app.database import engine, Base
+from app.api import brands, feedback, shops
+from app.database import Base, engine
 from app.logger import logger
-import time
-from fastapi import Request
 
 # Create database tables
 Base.metadata.create_all(bind=engine)

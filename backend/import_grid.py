@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """
 Grid-based import for complete Taiwan coverage.
 
@@ -15,11 +16,10 @@ Usage:
     python import_grid.py
 """
 
-import asyncio
 import argparse
+import asyncio
 import sys
 from datetime import datetime
-from typing import Optional
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -28,10 +28,10 @@ load_dotenv("../.env")
 
 sys.path.insert(0, ".")
 
-from app.database import SessionLocal, engine, Base
+from app.database import Base, SessionLocal, engine
 from app.models import Brand, Shop
-from app.services.google_places import GooglePlacesService
 from app.services.brand_matcher import match_brand_from_name
+from app.services.google_places import GooglePlacesService
 
 
 def get_or_create_brand(db, brand_data: dict) -> Brand:
@@ -198,8 +198,6 @@ TAIWAN_GRID = [
     {"name": "Penghu", "lat": 23.5711, "lng": 119.5793},
 ]
 
-from app.services.brand_matcher import match_brand_from_name
-
 
 def extract_city(lat: float, lng: float) -> str:
     """Estimate city from coordinates."""
@@ -313,7 +311,8 @@ async def import_brand_grid(
         await asyncio.sleep(0.3)
 
     print(
-        f"    📊 Total: +{imported} new, {skipped_dup} duplicates, {skipped_name} non-matching"
+        f"    📊 Total: +{imported} new, {skipped_dup} duplicates, "
+        f"{skipped_name} non-matching"
     )
     return imported
 
@@ -393,7 +392,8 @@ async def main():
         if not args.dry_run:
             new_total = db.query(Shop).count()
             print(
-                f"\n📊 Database now contains: {new_total} shops (+{new_total - existing_shops})"
+                f"\n📊 Database now contains: {new_total} shops "
+                f"(+{new_total - existing_shops})"
             )
 
     except Exception as e:

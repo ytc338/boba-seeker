@@ -1,11 +1,12 @@
+import argparse
 import os
 import sys
 import uuid
-import argparse
 from datetime import datetime, timezone
-from sqlalchemy import create_engine, text
+
 from dotenv import load_dotenv
 from rapidfuzz import fuzz, utils
+from sqlalchemy import create_engine, text
 
 # Load env
 # Load env
@@ -25,7 +26,8 @@ def create_brand_and_link(conn, brand_name, shop_ids):
     print(f"Creating Brand: {brand_name} ({brand_id})")
     conn.execute(
         text(
-            "INSERT INTO brands (id, name, created_at, updated_at) VALUES (:id, :name, :now, :now)"
+            "INSERT INTO brands (id, name, created_at, updated_at) "
+            "VALUES (:id, :name, :now, :now)"
         ),
         {"id": brand_id, "name": brand_name, "now": now},
     )
@@ -154,7 +156,8 @@ def interactive_brand_creator(min_size=3):
 
                     # Ask for name again just in case
                     new_name = input(
-                        f"Enter brand name for these {len(selected_shops)} shops (default: {cluster['name']}): "
+                        f"Enter brand name for these {len(selected_shops)} shops "
+                        f"(default: {cluster['name']}): "
                     ).strip()
                     final_name = new_name if new_name else cluster["name"]
 

@@ -3,17 +3,17 @@ Pytest fixtures for Boba Seeker backend tests.
 Provides test database, sessions, sample data, and mock utilities.
 """
 
-import pytest
 from datetime import datetime, timezone
+
+import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-from fastapi.testclient import TestClient
 
 from app.database import Base, get_db
 from app.models import Brand, Shop
 from main import app
-
 
 # ============================================================================
 # Database Fixtures

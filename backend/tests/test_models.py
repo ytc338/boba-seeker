@@ -2,8 +2,9 @@
 Tests for database models.
 """
 
+from datetime import datetime
+
 import pytest
-from datetime import datetime, timezone
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Brand, Shop

@@ -1,7 +1,10 @@
 import os
 import sys
-from sqlalchemy import create_engine, text
+
 from dotenv import load_dotenv
+from sqlalchemy import create_engine, text
+
+from app.services.brand_matcher import calculate_match_score, normalize_name
 
 # Load env
 # Use CWD for .env
@@ -9,7 +12,6 @@ load_dotenv(os.path.join(os.getcwd(), ".env"))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import from centralized service
-from app.services.brand_matcher import calculate_match_score, normalize_name
 
 
 def find_potential_brands():
@@ -37,7 +39,8 @@ def find_potential_brands():
     clusters = []
 
     # We want to ignore very generic matches, but rapidfuzz handles a lot.
-    # We might want to pre-clean names (remove city names if possible), but let's start simple.
+    # We might want to pre-clean names (remove city names if possible),
+    # but let's start simple.
 
     for name in shop_names:
         # Simple normalization for the loop
@@ -48,7 +51,8 @@ def find_potential_brands():
         matched = False
         for cluster in clusters:
             # Check against representative
-            # token_set_ratio is good for subset matches: "Gong Cha" vs "Gong Cha SJ" -> 100
+            # token_set_ratio is good for subset matches:
+            # "Gong Cha" vs "Gong Cha SJ" -> 100
             score = calculate_match_score(cluster["name"], name)
 
             if score >= 85:  # Threshold

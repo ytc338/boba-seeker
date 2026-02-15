@@ -2,8 +2,6 @@
 Tests for the Shops API endpoints.
 """
 
-import pytest
-
 
 class TestListShops:
     """Tests for GET /api/shops"""

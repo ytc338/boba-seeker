@@ -3,31 +3,34 @@
 Smart Sync from Source DB (.env) to Target DB (.env.prod).
 
 Features:
-1.  **Brand Sync**: Matches by `name`. Maps Source IDs to Target IDs correctly, handling mismatched sequences.
-2.  **Shop Sync**: Matches by `google_place_id`. Uses the ID map to rewrite `brand_id` references before upserting.
-3.  **Conflict Resolution**: Uses `google_place_id` for Shops and `name` for Brands as the "Real" keys.
-4.  **Preserves Target IDs**: Does not overwrite the Primary Key (`id`) of existing rows in Target.
+1.  **Brand Sync**: Matches by `name`. Maps Source IDs to Target IDs correctly,
+    handling mismatched sequences.
+2.  **Shop Sync**: Matches by `google_place_id`. Uses the ID map to rewrite
+    `brand_id` references before upserting.
+3.  **Conflict Resolution**: Uses `google_place_id` for Shops and `name` for
+    Brands as the "Real" keys.
+4.  **Preserves Target IDs**: Does not overwrite the Primary Key (`id`) of existing
+    rows in Target.
 
 Usage:
     python backend/sync_db.py [--dry-run]
 """
 
-import sys
-import os
 import argparse
-from typing import Dict, Any, List
-from datetime import datetime
+import os
+import sys
+from typing import Dict
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from dotenv import dotenv_values
-from sqlalchemy import create_engine, text, inspect
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.orm import sessionmaker
 
 # Import models to ensure they are registered
-from app.models import Brand, Shop, Base
+from app.models import Brand, Shop
 
 
 def get_db_url(env_file_name: str) -> str:
@@ -187,7 +190,8 @@ def update_sequences(target_session):
         try:
             target_session.execute(
                 text(
-                    f"SELECT setval('{table}_id_seq', COALESCE((SELECT MAX(id) FROM {table}), 1), true)"
+                    f"SELECT setval('{table}_id_seq', "
+                    f"COALESCE((SELECT MAX(id) FROM {table}), 1), true)"
                 )
             )
             print(f"   Updated sequence for {table}")

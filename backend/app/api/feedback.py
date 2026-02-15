@@ -1,9 +1,11 @@
 import os
 import smtplib
-import bleach
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+import bleach
 from fastapi import APIRouter
+
 from ..schemas import FeedbackCreate
 
 router = APIRouter()

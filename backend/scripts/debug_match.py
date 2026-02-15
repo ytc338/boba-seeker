@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 
 # Add backend directory to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -19,7 +19,7 @@ class MockBrand:
 def test_specific_match():
     # Brand 43
     boba_guys = MockBrand(43, "Boba Guys", "Boba Guys")
-    brands = [boba_guys]
+    boba_guys = MockBrand(43, "Boba Guys", "Boba Guys")
 
     # Shop 5033 name
     shop_name = "The Berry’s Boba Matcha"
@@ -27,7 +27,8 @@ def test_specific_match():
     print(f"Testing Shop: '{shop_name}' vs Brand: '{boba_guys.name}'")
 
     # Match returns confidence only in the service version (it returns float)
-    # The script previously expected (matched_brand, confidence) from find_best_brand_match/fuzzy_match_brand
+    # The script previously expected (matched_brand, confidence) from
+    # find_best_brand_match/fuzzy_match_brand.
     # But wait, fuzzy_match_brand usually returns (brand_obj, confidence).
     # match_brand_from_name returns float confidence.
 

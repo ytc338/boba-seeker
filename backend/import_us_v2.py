@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """
 US Boba Import v2 - Three-Layer Brand Coverage Strategy
 
@@ -17,8 +18,8 @@ Usage:
     python import_us_v2.py --sync-to "..."    # Sync to production
 """
 
-import asyncio
 import argparse
+import asyncio
 import sys
 from datetime import datetime, timezone
 
@@ -28,10 +29,11 @@ load_dotenv("../.env")
 
 sys.path.insert(0, ".")
 
-from app.database import SessionLocal, engine, Base
-from app.models import Brand, Shop
-from app.services.google_places_v2 import GooglePlacesServiceV2
+from app.database import Base, SessionLocal, engine  # noqa: E402
 from app.logger import logger
+from app.models import Brand, Shop
+from app.services.brand_matcher import find_best_brand_match, match_brand_from_name
+from app.services.google_places_v2 import GooglePlacesServiceV2
 
 Base.metadata.create_all(bind=engine)
 
@@ -500,9 +502,6 @@ def get_all_brands_for_city(city: str) -> list[dict]:
     return brands
 
 
-from app.services.brand_matcher import find_best_brand_match, match_brand_from_name
-
-
 # ============================================================
 # IMPORT FUNCTIONS
 # ============================================================
@@ -536,7 +535,8 @@ async def import_brands_for_city(
     grid = CITY_GRIDS.get(city, [])
 
     logger.info(
-        f"Starting brand import for {city} - Brands: {len(brands)}, Grid points: {len(grid)}"
+        f"Starting brand import for {city} - Brands: {len(brands)}, "
+        f"Grid points: {len(grid)}"
     )
 
     total = 0
@@ -619,7 +619,7 @@ async def discovery_search(
     Attempts to link discovered shops to known brands via fuzzy matching.
     """
     grid = CITY_GRIDS.get(city, [])
-    all_brands = get_all_brands_for_city(city)
+    # all_brands = get_all_brands_for_city(city)
 
     # Load existing brands from DB for linking
     db_brands = db.query(Brand).all()
@@ -663,11 +663,15 @@ async def discovery_search(
                     "name_zh": b.name_zh,
                     "aliases": [],
                 }  # Aliases not in DB yet?
-                # Wait, new module relies on aliases. DB doesn't have aliases column usually?
-                # `import_us_v2.py` defined aliases in constants. DB `brands` table doesn't seem to have `aliases` column in `inspect_db` output.
+                # Wait, new module relies on aliases. DB doesn't have aliases column
+                # usually?
+                # `import_us_v2.py` defined aliases in constants. DB `brands` table
+                # doesn't seem to have `aliases` column in `inspect_db` output.
                 # So we lose aliases here unless we merge with constants?
-                # The prompt asked to "take out BRAND_ALIASES... into a file". The `brand_matcher` has them.
-                # So `match_brand_from_name` inside `find_best_brand_match` will look them up from `BRAND_ALIASES` global in module if not provided!
+                # The prompt asked to "take out BRAND_ALIASES... into a file".
+                # The `brand_matcher` has them.
+                # So `match_brand_from_name` inside `find_best_brand_match` will look
+                # them up from `BRAND_ALIASES` global in module if not provided!
                 # Perfect.
                 for b in db_brands
             ]
@@ -825,12 +829,14 @@ def sync_to_database(target_url: str):
         # Reset sequences for PostgreSQL
         target_db.execute(
             text(
-                "SELECT setval('brands_id_seq', COALESCE((SELECT MAX(id) FROM brands), 1), true)"
+                "SELECT setval('brands_id_seq', "
+                "COALESCE((SELECT MAX(id) FROM brands), 1), true)"
             )
         )
         target_db.execute(
             text(
-                "SELECT setval('shops_id_seq', COALESCE((SELECT MAX(id) FROM shops), 1), true)"
+                "SELECT setval('shops_id_seq', "
+                "COALESCE((SELECT MAX(id) FROM shops), 1), true)"
             )
         )
         target_db.commit()

@@ -1,8 +1,11 @@
 import os
 import sys
 from datetime import datetime, timezone
-from sqlalchemy import create_engine, text
+
 from dotenv import load_dotenv
+from sqlalchemy import create_engine, text
+
+from app.services.brand_matcher import match_brand_from_name
 
 # Load env and add path
 # Load env and add path
@@ -13,7 +16,6 @@ load_dotenv(env_path)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import the FIXED verification logic
-from app.services.brand_matcher import match_brand_from_name
 
 
 def fix_bad_mappings(dry_run=True):
@@ -72,9 +74,10 @@ def fix_bad_mappings(dry_run=True):
                     invalid_groups[brand_name] = []
                 invalid_groups[brand_name].append(shop)
 
-        total_invalid = sum(len(l) for l in invalid_groups.values())
+        total_invalid = sum(len(group) for group in invalid_groups.values())
         print(
-            f"\nFound {total_invalid} invalid mappings across {len(invalid_groups)} brands."
+            f"\nFound {total_invalid} invalid mappings across "
+            f"{len(invalid_groups)} brands."
         )
 
         if total_invalid == 0:
@@ -86,7 +89,8 @@ def fix_bad_mappings(dry_run=True):
             for brand_name, bad_shops in invalid_groups.items():
                 print(f"  • {brand_name}: {len(bad_shops)} invalid matches")
             print(
-                "\nRun with 'python backend/fix_bad_mappings.py' (without dry run arg if using script manually) to clean up."
+                "\nRun with 'python backend/fix_bad_mappings.py' (without dry run arg "
+                "if using script manually) to clean up."
             )
             return
 
@@ -106,10 +110,10 @@ def fix_bad_mappings(dry_run=True):
             if len(bad_shops) > 10:
                 print(f"  ... and {len(bad_shops) - 10} more")
 
-            print(f"\nOptions:")
+            print("\nOptions:")
             print(f"  [y] Unlink ALL {len(bad_shops)} shops for {brand_name}")
-            print(f"  [n] Skip this brand")
-            print(f"  [i] Inspect one by one (Individual mode)")
+            print("  [n] Skip this brand")
+            print("  [i] Inspect one by one (Individual mode)")
 
             while True:
                 choice = input("Choice: ").strip().lower()
@@ -119,7 +123,8 @@ def fix_bad_mappings(dry_run=True):
                     ids = tuple(s.id for s in bad_shops)
                     conn.execute(
                         text(
-                            "UPDATE shops SET brand_id = NULL, updated_at = :now WHERE id IN :ids"
+                            "UPDATE shops SET brand_id = NULL, updated_at = :now "
+                            "WHERE id IN :ids"
                         ),
                         {"now": datetime.now(timezone.utc), "ids": ids},
                     )
@@ -139,7 +144,8 @@ def fix_bad_mappings(dry_run=True):
                         if sub == "y":
                             conn.execute(
                                 text(
-                                    "UPDATE shops SET brand_id = NULL, updated_at = :now WHERE id = :id"
+                                    "UPDATE shops SET brand_id = NULL, "
+                                    "updated_at = :now WHERE id = :id"
                                 ),
                                 {"now": datetime.now(timezone.utc), "id": s.id},
                             )
@@ -155,7 +161,8 @@ def fix_bad_mappings(dry_run=True):
 
 
 if __name__ == "__main__":
-    # Always interactive unless flag passed? Let's just default to interactive given the use case.
+    # Always interactive unless flag passed?
+    # Let's just default to interactive given the use case.
     import argparse
 
     parser = argparse.ArgumentParser()

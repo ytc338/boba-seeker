@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """
 Import Singapore boba shop data from Google Places API.
 
@@ -18,12 +19,11 @@ Usage:
     DATABASE_URL="postgresql://..." python import_singapore.py
 """
 
-import asyncio
 import argparse
-import sys
+import asyncio
 import os
+import sys
 from datetime import datetime
-from typing import Optional
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -32,8 +32,9 @@ load_dotenv("../.env")
 
 sys.path.insert(0, ".")
 
-from app.database import SessionLocal, engine, Base
+from app.database import Base, SessionLocal, engine  # noqa: E402
 from app.models import Brand, Shop
+from app.services.brand_matcher import match_brand_from_name
 from app.services.google_places import GooglePlacesService
 
 # Create/update tables
@@ -173,7 +174,8 @@ BRANDS = [
 ]
 
 # Grid points covering Singapore
-# Singapore is small (~50km x 27km), so 6 points with 15km radius each provide good coverage
+# Singapore is small (~50km x 27km), so 6 points with 15km radius
+# each provide good coverage
 SINGAPORE_GRID = [
     {"name": "Central (Orchard/City)", "lat": 1.2897, "lng": 103.8501},
     {"name": "East (Tampines/Changi)", "lat": 1.3220, "lng": 103.9430},
@@ -182,8 +184,6 @@ SINGAPORE_GRID = [
     {"name": "Northeast (Punggol/Sengkang)", "lat": 1.3505, "lng": 103.9430},
     {"name": "South (Harbourfront)", "lat": 1.2700, "lng": 103.8200},
 ]
-
-from app.services.brand_matcher import match_brand_from_name
 
 
 def get_or_create_brand(db, brand_data: dict) -> Brand:
@@ -236,8 +236,8 @@ def sync_to_database(target_url: str, country: str = "SG"):
     print("=" * 60)
     print("🔄 Singapore Data Sync (No API calls)")
     print("=" * 60)
-    print(f"📤 Source: Local SQLite")
-    print(f"📥 Target: PostgreSQL")
+    print("📤 Source: Local SQLite")
+    print("📥 Target: PostgreSQL")
     print()
 
     # Source: local SQLite
@@ -332,19 +332,21 @@ def sync_to_database(target_url: str, country: str = "SG"):
         # Update sequences for PostgreSQL
         target_db.execute(
             text("""
-            SELECT setval('brands_id_seq', COALESCE((SELECT MAX(id) FROM brands), 1), true)
+            SELECT setval('brands_id_seq',
+            COALESCE((SELECT MAX(id) FROM brands), 1), true)
         """)
         )
         target_db.execute(
             text("""
-            SELECT setval('shops_id_seq', COALESCE((SELECT MAX(id) FROM shops), 1), true)
+            SELECT setval('shops_id_seq',
+            COALESCE((SELECT MAX(id) FROM shops), 1), true)
         """)
         )
         target_db.commit()
 
         print()
         print("=" * 60)
-        print(f"✅ Sync complete!")
+        print("✅ Sync complete!")
         print(f"   Brands: +{brands_added}")
         print(f"   Shops: +{shops_added} new, {shops_skipped} already existed")
         print("=" * 60)
@@ -352,7 +354,7 @@ def sync_to_database(target_url: str, country: str = "SG"):
         # Show target stats
         target_total = target_db.query(Shop).count()
         target_sg = target_db.query(Shop).filter(Shop.country == country).count()
-        print(f"\n📊 Target database now contains:")
+        print("\n📊 Target database now contains:")
         print(f"   • {target_total} total shops")
         print(f"   • {target_sg} Singapore shops")
 
@@ -458,7 +460,8 @@ async def import_brand_grid(
         await asyncio.sleep(0.3)
 
     print(
-        f"    📊 Total: +{imported} new, {skipped_dup} duplicates, {skipped_name} non-matching"
+        f"    📊 Total: +{imported} new, {skipped_dup} duplicates, "
+        f"{skipped_name} non-matching"
     )
     return imported
 
@@ -515,7 +518,8 @@ async def main():
         existing_shops = db.query(Shop).count()
         existing_sg_shops = db.query(Shop).filter(Shop.country == "SG").count()
         print(
-            f"\n📊 Existing shops: {existing_shops} total, {existing_sg_shops} in Singapore"
+            f"\n📊 Existing shops: {existing_shops} total, "
+            f"{existing_sg_shops} in Singapore"
         )
 
         # Pre-load existing place IDs
@@ -562,10 +566,11 @@ async def main():
         if not args.dry_run:
             new_total = db.query(Shop).count()
             new_sg_total = db.query(Shop).filter(Shop.country == "SG").count()
-            print(f"\n📊 Database now contains:")
+            print("\n📊 Database now contains:")
             print(f"   • {new_total} total shops")
             print(
-                f"   • {new_sg_total} Singapore shops (+{new_sg_total - existing_sg_shops})"
+                f"   • {new_sg_total} Singapore shops "
+                f"(+{new_sg_total - existing_sg_shops})"
             )
 
     except Exception as e:

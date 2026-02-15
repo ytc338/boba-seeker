@@ -4,13 +4,14 @@ Sync Dev Shop IDs to match Prod Shop IDs for the same google_place_id.
 Handles potential primary key conflicts by using a temporary ID space.
 """
 
-import sys
-import os
 import argparse
-from typing import Dict, List, Set, Tuple
+import os
+import sys
+from typing import Dict, List, Tuple
+
+from dotenv import dotenv_values
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from dotenv import dotenv_values
 
 # Add parent directory to path
 # Add backend directory to path
@@ -128,8 +129,8 @@ def main():
                 sys.exit(0)
 
         # 5. Execute Updates Correctly
-        # We cannot just do UPDATE shops SET id=new WHERE id=old because 'new' might be occupied by another shop
-        # that hasn't moved yet.
+        # We cannot just update shops SET id=new WHERE id=old because 'new' might be
+        # occupied by another shop that hasn't moved yet.
         # Strategy:
         # 1. Shift ALL affected shops to a temporary Safe Zone (e.g. negative IDs).
         # 2. Shift from Safe Zone to Target IDs.
@@ -141,8 +142,8 @@ def main():
         temp_map = {}  # old_id -> temp_id
         final_map = {}  # temp_id -> new_id
 
-        # We need a safely unused range. Negative IDs are usually safe in integer PKs if not used.
-        # Let's verify no negative IDs exist.
+        # We need a safely unused range. Negative IDs are usually safe in integer PKs
+        # if not used. Let's verify no negative IDs exist.
         min_id = dev_session.execute(text("SELECT MIN(id) FROM shops")).scalar() or 0
         start_temp = -1
         if min_id < 0:
@@ -155,9 +156,10 @@ def main():
         # Note: We must move matched shops.
         # Check: Is the *target* ID occupied by a shop that *isn't* in our update list?
         # If so, we have a problem (collision with a shop that isn't moving).
-        # In this specific context (syncing completely), presumably we want to sync these.
-        # But if there is a Shop C in Dev with ID=100 (and different google_place_id, or no match),
-        # and we want to move Shop A to ID=100, we will fail unless we move Shop C too.
+        # In this specific context (syncing completely), presumably we want to sync
+        # these. But if there is a Shop C in Dev with ID=100 (and different
+        # google_place_id, or no match), and we want to move Shop A to ID=100, we
+        # will fail unless we move Shop C too.
 
         # Check for collisions with non-moving shops
         target_ids = {u[2] for u in updates}
@@ -168,15 +170,19 @@ def main():
 
         moving_source_ids = {u[1] for u in updates}
 
-        # Collision = (Target ID is in Occupied) AND (Target ID is NOT in Moving Source IDs)
-        # If Target ID is in Moving Source IDs, it will move out of the way (step 1), so it's safe.
-        # If Target ID is NOT matching any gpid we are syncing, it stays put -> Collision.
+        # Collision = (Target ID is in Occupied) AND
+        #             (Target ID is NOT in Moving Source IDs)
+        # If Target ID is in Moving Source IDs, it will move out of the way (step 1),
+        # so it's safe.
+        # If Target ID is NOT matching any gpid we are syncing, it stays put
+        # -> Collision.
 
         collisions = target_ids.intersection(occupied_ids) - moving_source_ids
 
         if collisions:
             print(
-                f"❌ CRITICAL ERROR: {len(collisions)} target IDs are occupied by shops that are NOT part of the sync map."
+                f"❌ CRITICAL ERROR: {len(collisions)} target IDs are occupied by "
+                "shops that are NOT part of the sync map."
             )
             print(f"   Example collisions: {list(collisions)[:5]}")
             print("   This script only swaps IDs for known Google Place ID matches.")

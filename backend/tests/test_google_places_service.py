@@ -3,9 +3,10 @@ Tests for Google Places API service.
 Uses mocked HTTP responses to avoid actual API calls.
 """
 
-import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import httpx
+import pytest
 
 
 class TestGooglePlacesServiceV2:
