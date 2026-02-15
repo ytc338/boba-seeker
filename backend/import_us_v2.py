@@ -30,6 +30,7 @@ sys.path.insert(0, ".")
 from app.database import SessionLocal, engine, Base
 from app.models import Brand, Shop
 from app.services.google_places_v2 import GooglePlacesServiceV2
+from app.logger import logger
 
 Base.metadata.create_all(bind=engine)
 
@@ -227,7 +228,7 @@ def get_or_create_brand(db, brand_data: dict) -> "Brand":
         brand = Brand(**data)
         db.add(brand)
         db.flush()
-        print(f"    ✅ Created brand: {brand_data['name']}")
+        logger.info(f"Created brand: {brand_data['name']}")
     return brand
 
 
@@ -245,7 +246,7 @@ async def import_brands_for_city(
     brands = get_all_brands_for_city(city)
     grid = CITY_GRIDS.get(city, [])
     
-    print(f"\n  🏷️  Brands: {len(brands)} | Grid: {len(grid)} points")
+    logger.info(f"Starting brand import for {city} - Brands: {len(brands)}, Grid points: {len(grid)}")
     
     total = 0
     for brand_data in brands:
@@ -301,7 +302,7 @@ async def import_brands_for_city(
         
         if brand_count > 0:
             db.commit()
-            print(f"      {brand.name}: +{brand_count}")
+            logger.info(f"{brand.name}: +{brand_count} shops found in {city}")
             total += brand_count
     
     return total
@@ -323,7 +324,7 @@ async def discovery_search(
     # Load existing brands from DB for linking
     db_brands = db.query(Brand).all()
     
-    print(f"\n  🔍 Discovery mode: searching 'boba tea' at {len(grid)} points")
+    logger.info(f"Discovery mode: searching 'boba tea' at {len(grid)} points in {city}")
     
     discovered = 0
     linked = 0
@@ -388,14 +389,14 @@ async def discovery_search(
             
             if matched_brand:
                 linked += 1
-                print(f"      🔗 {shop_name} → {matched_brand.name}")
+                logger.debug(f"Linked {shop_name} to brand {matched_brand.name}")
             else:
-                print(f"      🆕 {shop_name} (independent)")
+                logger.debug(f"New independent shop found: {shop_name}")
         
         await asyncio.sleep(0.25)
     
     db.commit()
-    print(f"  📊 Discovery: {discovered} total, {linked} linked to brands")
+    logger.info(f"Discovery result for {city}: {discovered} total, {linked} linked to brands")
     return discovered
 
 
@@ -555,11 +556,11 @@ async def main():
             grand_total += count
         
         print(f"\n{'='*60}")
-        print(f"✅ COMPLETE! Imported {grand_total} shops")
+        logger.info(f"COMPLETE! Imported {grand_total} shops")
         print("=" * 60)
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        logger.error(f"Error during import: {e}")
         import traceback
         traceback.print_exc()
         db.rollback()

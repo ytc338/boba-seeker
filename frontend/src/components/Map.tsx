@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { Shop } from '../types';
 import './Map.css';
+import { logger } from '../utils/logger';
 
 // Set token from environment
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
@@ -70,7 +71,7 @@ export default function Map({
     if (!mapContainer.current || map.current) return;
 
     if (!mapboxgl.accessToken) {
-      console.warn('Mapbox token not set. Add VITE_MAPBOX_TOKEN to .env');
+      logger.warn('Mapbox token not set. Add VITE_MAPBOX_TOKEN to .env');
       return;
     }
 
@@ -173,9 +174,11 @@ export default function Map({
       // Mark that user has moved the map (ignore initial load)
       map.current.on('dragstart', () => {
         hasMovedRef.current = true;
+        logger.debug('User started dragging the map');
       });
       map.current.on('zoomstart', () => {
         hasMovedRef.current = true;
+        logger.debug('User started zooming the map');
       });
 
       // Try to get user location on init
@@ -188,16 +191,17 @@ export default function Map({
                 zoom: DEFAULT_ZOOM,
                 duration: 1500,
               });
+              logger.info('Initial geolocation success', { lat: position.coords.latitude, lng: position.coords.longitude });
             }
           },
           () => {
-            console.log('Geolocation not available, using default center');
+            logger.info('Geolocation not available, using default center');
           },
           { enableHighAccuracy: true, timeout: 5000 }
         );
       }
     } catch (err) {
-      console.error('Failed to initialize map:', err);
+      logger.error('Failed to initialize map', err);
     }
 
     return () => {
@@ -299,6 +303,7 @@ export default function Map({
   const locateUser = useCallback(() => {
     if (!navigator.geolocation || !map.current) return;
 
+    logger.info('User requested location');
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -324,7 +329,7 @@ export default function Map({
         setLocating(false);
       },
       (error) => {
-        console.error('Geolocation error:', error);
+        logger.error('Geolocation error', error);
         setLocating(false);
         alert('Could not get your location.');
       },
@@ -349,7 +354,10 @@ export default function Map({
       {mapboxgl.accessToken && showSearchButton && (
         <button
           className="search-area-button"
-          onClick={onSearchClick}
+          onClick={() => {
+            logger.info('User clicked Search This Area');
+            onSearchClick?.();
+          }}
           disabled={searchLoading}
         >
           {searchLoading ? 'Searching...' : 'Search This Area'}

@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import shops, brands, feedback
 from app.database import engine, Base
+from app.logger import logger
+import time
+from fastapi import Request
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -26,6 +29,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = (time.time() - start_time) * 1000
+    
+    logger.info(
+        f"{request.method} {request.url.path} - "
+        f"Status: {response.status_code} - "
+        f"Duration: {process_time:.2f}ms"
+    )
+    return response
+
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Boba Seeker API starting up...")
 
 # Include routers
 app.include_router(shops.router, prefix="/api/shops", tags=["shops"])

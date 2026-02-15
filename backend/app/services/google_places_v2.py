@@ -24,7 +24,7 @@ We explicitly EXCLUDE (Enterprise tier, costs extra):
 
 import os
 import httpx
-from typing import Optional
+from ..logger import logger
 
 
 class GooglePlacesServiceV2:
@@ -43,7 +43,7 @@ class GooglePlacesServiceV2:
     def __init__(self):
         self.api_key = os.getenv("GOOGLE_PLACES_API_KEY")
         if not self.api_key:
-            print("Warning: GOOGLE_PLACES_API_KEY not set. Google Places features disabled.")
+            logger.warning("GOOGLE_PLACES_API_KEY not set. Google Places features disabled.")
     
     async def nearby_search(
         self,
@@ -126,7 +126,7 @@ class GooglePlacesServiceV2:
                 )
                 
                 if response.status_code != 200:
-                    print(f"Nearby search error: {response.status_code} - {response.text}")
+                    logger.error(f"Nearby search error: {response.status_code} - {response.text}")
                     break
                 
                 data = response.json()
@@ -221,7 +221,7 @@ class GooglePlacesServiceV2:
                 )
                 
                 if response.status_code != 200:
-                    print(f"Text search error: {response.status_code} - {response.text}")
+                    logger.error(f"Text search error: {response.status_code} - {response.text}")
                     break
                 
                 data = response.json()
