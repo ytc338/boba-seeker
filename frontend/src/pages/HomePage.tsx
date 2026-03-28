@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { Shop, Brand } from '../types';
-import { getNearbyShops, getBrands } from '../services/api';
+import { getNearbyShops, getBrands, searchShops } from '../services/api';
 import Map from '../components/Map';
 import FilterPanel from '../components/FilterPanel';
 import BottomSheet from '../components/BottomSheet';
 import RouletteOverlay from '../components/RouletteOverlay';
 import './HomePage.css';
 
-// Default center: Taipei
+// Default center: New York
 const DEFAULT_CENTER = { lat: 40.74, lng: -74.98 };
 
 // Helper to detect region from coordinates
@@ -34,23 +34,28 @@ export default function HomePage() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
-  
+
   // Filter state
   const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string>(''); // '' = All
-  
+
   // Loading state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Map bounds for "Search This Area"
   const [mapBounds, setMapBounds] = useState<{
     minLat: number; maxLat: number; minLng: number; maxLng: number;
   } | null>(null);
   const [showSearchButton, setShowSearchButton] = useState(false);
-  
+
   // Bottom sheet height for map padding
   const [sheetHeight, setSheetHeight] = useState(0);
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Shop[] | null>(null);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   // Roulette state
   const location = useLocation();
@@ -63,7 +68,7 @@ export default function HomePage() {
     getBrands(selectedRegion || undefined)
       .then(setBrands)
       .catch((err) => console.error('Failed to fetch brands:', err));
-    
+
     // Clear brand selection when region changes
     setSelectedBrands([]);
   }, [selectedRegion]);
@@ -75,7 +80,7 @@ export default function HomePage() {
       setError(null);
       const data = await getNearbyShops(lat, lng, 10); // 10km radius
       setShops(data);
-      
+
       // Auto-detect and set region based on coordinates
       const detectedRegion = detectRegion(lat, lng);
       setSelectedRegion(detectedRegion);
@@ -87,7 +92,7 @@ export default function HomePage() {
     }
   }, []);
 
-  // On mount: try GPS, fallback to Taipei
+  // On mount: try GPS, fallback to default
   useEffect(() => {
     if (!navigator.geolocation) {
       loadNearbyShops(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng);
@@ -99,7 +104,6 @@ export default function HomePage() {
         loadNearbyShops(position.coords.latitude, position.coords.longitude);
       },
       () => {
-        // Denied or error - fallback to Taipei
         loadNearbyShops(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng);
       },
       { enableHighAccuracy: true, timeout: 5000 }
@@ -117,22 +121,22 @@ export default function HomePage() {
   // Search this area
   const handleSearchArea = useCallback(async () => {
     if (!mapBounds) return;
-    
+
     // Calculate center of visible bounds
     const centerLat = (mapBounds.minLat + mapBounds.maxLat) / 2;
     const centerLng = (mapBounds.minLng + mapBounds.maxLng) / 2;
-    
+
     // Calculate approximate radius from bounds
     const latDiff = (mapBounds.maxLat - mapBounds.minLat) / 2;
     const radiusKm = latDiff * 111; // 1 degree ≈ 111km
-    
+
     try {
       setLoading(true);
       setError(null);
       setShowSearchButton(false);
       const data = await getNearbyShops(centerLat, centerLng, Math.max(radiusKm, 5));
       setShops(data);
-      
+
       // Update region based on new map center
       const detectedRegion = detectRegion(centerLat, centerLng);
       setSelectedRegion(detectedRegion);
@@ -146,13 +150,14 @@ export default function HomePage() {
 
   // Client-side filtering by brand
   const filteredShops = useMemo(() => {
+    const base = searchResults ?? shops;
     if (selectedBrands.length === 0) {
-      return shops;
+      return base;
     }
-    return shops.filter(
+    return base.filter(
       (shop) => shop.brand_id && selectedBrands.includes(shop.brand_id)
     );
-  }, [shops, selectedBrands]);
+  }, [shops, searchResults, selectedBrands]);
 
   // Toggle brand selection
   const handleBrandToggle = (brandId: number) => {
@@ -173,15 +178,37 @@ export default function HomePage() {
     setSelectedBrands([]);
   };
 
+  // Search by name
+  const handleSearchSubmit = useCallback(async () => {
+    const query = searchQuery.trim();
+    if (!query) return;
+
+    try {
+      setSearchLoading(true);
+      const results = await searchShops(query, 50);
+      setSearchResults(results);
+      setSelectedShop(null);
+    } catch (err) {
+      console.error('Search failed:', err);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, [searchQuery]);
+
+  const handleSearchClear = useCallback(() => {
+    setSearchQuery('');
+    setSearchResults(null);
+  }, []);
+
   // Roulette Logic
   const startRoulette = useCallback(() => {
     // Only pick from shops currently visible on the map
     let visibleShops = filteredShops;
     if (mapBounds) {
-      visibleShops = filteredShops.filter(shop => 
-        shop.latitude >= mapBounds.minLat && 
-        shop.latitude <= mapBounds.maxLat && 
-        shop.longitude >= mapBounds.minLng && 
+      visibleShops = filteredShops.filter(shop =>
+        shop.latitude >= mapBounds.minLat &&
+        shop.latitude <= mapBounds.maxLat &&
+        shop.longitude >= mapBounds.minLng &&
         shop.longitude <= mapBounds.maxLng
       );
     }
@@ -199,24 +226,6 @@ export default function HomePage() {
     const intervalTime = 100; // Switch every 100ms
     const startTime = Date.now();
 
-    /**
-     * Sets up an interval that continuously highlights random shops from the visible set
-     * until the specified duration expires, then selects a winner shop.
-     * 
-     * @remarks
-     * - Highlights a random shop from the visible shops on each interval tick
-     * - Checks elapsed time against the specified duration
-     * - Clears the interval and selects a final winner when time expires
-     * - Triggers a map flyTo animation via the Map component's setSelectedShop listener
-     * 
-     * @param visibleShops - Array of shop objects to randomly select from
-     * @param startTime - Timestamp (in ms) when the roulette started
-     * @param duration - Total duration (in ms) the roulette should run
-     * @param intervalTime - Time (in ms) between each shop highlight change
-     * @param setHighlightedShopId - State setter for the currently highlighted shop ID
-     * @param setRouletteState - State setter for the roulette state ('idle' when finished)
-     * @param setSelectedShop - State setter for the final selected/winning shop
-     */
     const intervalId = setInterval(() => {
       // Pick random shop from visible set to highlight
       const randomIndex = Math.floor(Math.random() * visibleShops.length);
@@ -225,11 +234,11 @@ export default function HomePage() {
       // Check if time is up
       if (Date.now() - startTime >= duration) {
         clearInterval(intervalId);
-        
+
         // Pick winner from visible set
         const winnerIndex = Math.floor(Math.random() * visibleShops.length);
         const winner = visibleShops[winnerIndex];
-        
+
         setHighlightedShopId(null);
         setRouletteState('idle');
         setSelectedShop(winner); // This triggers map flyTo in Map component
@@ -245,22 +254,16 @@ export default function HomePage() {
     if (params.get('action') === 'explore') {
       // Remove param without reload
       navigate(location.pathname, { replace: true });
-      
-      // Start roulette if shops are loaded, otherwise wait or retry
+
       if (!loading) {
          startRoulette();
       } else {
-         // If loading, we could wait or just ignore. 
-         // For now, let's retry once after a short delay if filteredShops has data?
-         // Simpler: Just rely on user clicking again if it fails during load.
-         // Or: add simple check.
          const checkLoaded = setInterval(() => {
              if (!loading && shops.length > 0) {
                  clearInterval(checkLoaded);
                  startRoulette();
              }
          }, 500);
-         // Timeout after 5s
          setTimeout(() => clearInterval(checkLoaded), 5000);
       }
     }
@@ -269,13 +272,13 @@ export default function HomePage() {
   return (
     <div className="home-page map-first">
       {/* Roulette Overlay */}
-      <RouletteOverlay 
-        isSpinning={rouletteState === 'spinning'} 
+      <RouletteOverlay
+        isSpinning={rouletteState === 'spinning'}
         currentShopName={
-          highlightedShopId 
-            ? filteredShops.find(s => s.id === highlightedShopId)?.name 
+          highlightedShopId
+            ? filteredShops.find(s => s.id === highlightedShopId)?.name
             : undefined
-        } 
+        }
       />
 
       {/* Full-screen Map */}
@@ -311,6 +314,12 @@ export default function HomePage() {
         loading={loading}
         error={error}
         onHeightChange={setSheetHeight}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearchSubmit={handleSearchSubmit}
+        searchLoading={searchLoading}
+        onSearchClear={handleSearchClear}
+        isSearchActive={searchResults !== null}
       />
     </div>
   );

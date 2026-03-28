@@ -69,12 +69,60 @@
   color: var(--text-muted);
 }
 
-/* Shop list */
-.sheet-shop-list {
+/* Search bar */
+.sheet-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 8px;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: var(--accent);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-clear {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+
+.search-clear:hover {
+  text-decoration: underline;
+}
+
+/* Content area */
+.sheet-content {
   flex: 1;
   overflow-y: auto;
   padding: 0 16px;
   padding-bottom: max(32px, calc(16px + env(safe-area-inset-bottom)));
+}
+
+/* Shop list */
+.sheet-shop-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -111,6 +159,6 @@
   .sheet-header {
     padding: 4px 0 8px;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 12px;
+    margin-bottom: 4px;
   }
 }

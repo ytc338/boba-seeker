@@ -33,7 +33,7 @@ export default function ShopCard({ shop, isSelected, onClick }: ShopCardProps) {
           <span className="shop-brand">{shop.brand.name}</span>
         )}
         <span className="shop-country">
-          {shop.country === 'TW' ? '🇹🇼 Taiwan' : '🇺🇸 USA'}
+          {shop.country === 'TW' ? '🇹🇼 Taiwan' : shop.country === 'SG' ? '🇸🇬 Singapore' : '🇺🇸 USA'}
         </span>
       </div>
     </div>

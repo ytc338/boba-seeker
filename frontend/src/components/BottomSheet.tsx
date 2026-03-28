@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { Shop } from '../types';
 import ShopCard from './ShopCard';
+import ShopDetail from './ShopDetail';
 import './BottomSheet.css';
 
 type SheetState = 'collapsed' | 'peek' | 'expanded';
@@ -15,10 +16,16 @@ const SHEET_HEIGHTS = {
 interface BottomSheetProps {
   shops: Shop[];
   selectedShop: Shop | null;
-  onShopSelect: (shop: Shop) => void;
+  onShopSelect: (shop: Shop | null) => void;
   loading: boolean;
   error: string | null;
   onHeightChange?: (height: number) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  onSearchSubmit: () => void;
+  searchLoading: boolean;
+  onSearchClear: () => void;
+  isSearchActive: boolean;
 }
 
 export default function BottomSheet({
@@ -28,6 +35,12 @@ export default function BottomSheet({
   loading,
   error,
   onHeightChange,
+  searchQuery,
+  onSearchChange,
+  onSearchSubmit,
+  searchLoading,
+  onSearchClear,
+  isSearchActive,
 }: BottomSheetProps) {
   const [sheetState, setSheetState] = useState<SheetState>('peek');
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -35,10 +48,17 @@ export default function BottomSheet({
   const dragStartHeight = useRef<number>(0);
   const isDragging = useRef<boolean>(false);
 
+  // Expand sheet when a shop is selected for detail view
+  useEffect(() => {
+    if (selectedShop) {
+      setSheetState('expanded');
+    }
+  }, [selectedShop]);
+
   // Calculate and report current height
   useEffect(() => {
     if (!onHeightChange) return;
-    
+
     const calculateHeight = () => {
       if (sheetState === 'collapsed') {
         onHeightChange(SHEET_HEIGHTS.collapsed);
@@ -75,7 +95,7 @@ export default function BottomSheet({
   // Handle drag move
   const handleDragMove = useCallback((clientY: number) => {
     if (!isDragging.current || !sheetRef.current) return;
-    
+
     const deltaY = dragStartY.current - clientY;
     const newHeight = Math.max(72, Math.min(window.innerHeight * 0.7, dragStartHeight.current + deltaY));
     sheetRef.current.style.maxHeight = `${newHeight}px`;
@@ -85,26 +105,26 @@ export default function BottomSheet({
   const handleDragEnd = useCallback(() => {
     if (!isDragging.current || !sheetRef.current) return;
     isDragging.current = false;
-    
+
     const currentHeight = sheetRef.current.offsetHeight;
     const vh = window.innerHeight / 100;
-    
+
     // Calculate thresholds
     const collapsedHeight = SHEET_HEIGHTS.collapsed;
     const peekHeight = SHEET_HEIGHTS.peek * vh;
     const expandedHeight = SHEET_HEIGHTS.expanded * vh;
-    
+
     // Find nearest state
     const distances = {
       collapsed: Math.abs(currentHeight - collapsedHeight),
       peek: Math.abs(currentHeight - peekHeight),
       expanded: Math.abs(currentHeight - expandedHeight),
     };
-    
-    const nearestState = (Object.keys(distances) as SheetState[]).reduce((a, b) => 
+
+    const nearestState = (Object.keys(distances) as SheetState[]).reduce((a, b) =>
       distances[a] < distances[b] ? a : b
     );
-    
+
     // Reset inline style and let CSS handle the transition
     sheetRef.current.style.maxHeight = '';
     sheetRef.current.style.transition = '';
@@ -128,27 +148,33 @@ export default function BottomSheet({
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     handleDragStart(e.clientY);
-    
+
     const handleMouseMove = (e: MouseEvent) => handleDragMove(e.clientY);
     const handleMouseUp = () => {
       handleDragEnd();
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-    
+
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   }, [handleDragStart, handleDragMove, handleDragEnd]);
 
   // Auto-collapse when no shops
-  const effectiveState = shops.length === 0 && !loading ? 'collapsed' : sheetState;
+  const effectiveState = shops.length === 0 && !loading && !selectedShop ? 'collapsed' : sheetState;
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      onSearchSubmit();
+    }
+  };
 
   return (
     <div
       ref={sheetRef}
       className={`bottom-sheet ${effectiveState}`}
     >
-      <div 
+      <div
         className="sheet-handle"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -160,26 +186,54 @@ export default function BottomSheet({
         <div className="sheet-header">
           <span className="sheet-title">Boba Shops</span>
           <span className="shop-count">
-            {loading ? 'Loading...' : `${shops.length} found`}
+            {loading || searchLoading ? 'Loading...' : `${shops.length} found`}
           </span>
         </div>
       </div>
 
-      <div className="sheet-shop-list">
-        {error && <div className="error">{error}</div>}
-
-        {!loading && !error && shops.length === 0 && (
-          <div className="empty">No shops found</div>
+      {/* Search bar */}
+      <div className="sheet-search" onClick={(e) => e.stopPropagation()}>
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search shops by name..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          onKeyDown={handleSearchKeyDown}
+        />
+        {isSearchActive && (
+          <button className="search-clear" onClick={onSearchClear}>
+            Clear
+          </button>
         )}
+      </div>
 
-        {shops.map((shop) => (
-          <ShopCard
-            key={shop.id}
-            shop={shop}
-            isSelected={selectedShop?.id === shop.id}
-            onClick={() => onShopSelect(shop)}
+      <div className="sheet-content">
+        {selectedShop ? (
+          <ShopDetail
+            shop={selectedShop}
+            onBack={() => onShopSelect(null)}
           />
-        ))}
+        ) : (
+          <div className="sheet-shop-list">
+            {error && <div className="error">{error}</div>}
+
+            {!loading && !searchLoading && !error && shops.length === 0 && (
+              <div className="empty">
+                {isSearchActive ? 'No shops match your search' : 'No shops found'}
+              </div>
+            )}
+
+            {shops.map((shop) => (
+              <ShopCard
+                key={shop.id}
+                shop={shop}
+                isSelected={false}
+                onClick={() => onShopSelect(shop)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
