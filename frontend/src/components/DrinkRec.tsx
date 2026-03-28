@@ -16,43 +16,47 @@ interface Drink {
 const DRINK_RECS: Record<string, Drink[]> = {
   // === TAIWAN MAJORS ===
   'Wushiland Boba': [
-    { name: 'Four Seasons Green Tea', nameZh: '四季春', description: 'Light, floral oolong - the signature order', tier: 'first-timer' },
-    { name: 'Okinawa Milk Tea', nameZh: '沖繩黑糖奶茶', description: 'Rich brown sugar milk tea with pearls', tier: 'first-timer' },
-    { name: 'Yakult Green Tea', nameZh: '養樂多綠茶', description: 'Sweet-tart probiotic kick, great iced', tier: 'regular' },
+    { name: 'Boba Milk Tea', nameZh: '波霸奶茶', description: 'Their #1 best seller - classic milk tea with large pearls', tier: 'first-timer' },
+    { name: 'Four Seasons Green Tea', nameZh: '四季春', description: 'Light, floral oolong - a top 10 staple', tier: 'first-timer' },
+    { name: 'Ice Cream Black Tea', nameZh: '冰淇淋紅茶', description: 'Creamy black tea, their #2 best seller', tier: 'regular' },
+    { name: 'Yakult Green Tea', nameZh: '多多綠茶', description: 'Sweet-tart probiotic kick, great iced', tier: 'regular' },
   ],
   'CoCo Fresh Tea & Juice': [
-    { name: 'Panda Milk Tea', nameZh: '3Q奶茶', description: 'Milk tea with tapioca, pudding, and coconut jelly', tier: 'first-timer' },
-    { name: 'Fresh Taro Milk', nameZh: '鮮芋牛奶', description: 'Creamy taro with real taro chunks', tier: 'first-timer' },
+    { name: '3 Guys Milk Tea', nameZh: '3Q奶茶', description: 'Milk tea with tapioca, pudding, and coconut jelly', tier: 'first-timer' },
+    { name: 'Brown Sugar Pearl Latte', nameZh: '黑糖珍珠拿鐵', description: 'Caramelized brown sugar with fresh milk and pearls', tier: 'first-timer' },
     { name: 'Passion Fruit Green Tea', nameZh: '百香果綠茶', description: 'Bright and tangy fruit tea, no milk', tier: 'regular' },
   ],
   '清心福全': [
+    { name: 'Yakult Green Tea', nameZh: '優多綠茶', description: 'Their actual #1 best seller - probiotic meets green tea', tier: 'first-timer' },
     { name: 'Pearl Milk Tea', nameZh: '珍珠奶茶', description: 'The classic - done right with fresh pearls', tier: 'first-timer' },
     { name: 'Kumquat Lemon', nameZh: '金桔檸檬', description: 'Tart citrus refresher, very popular in summer', tier: 'regular' },
+    { name: 'Oolong Green Tea', nameZh: '烏龍綠茶', description: 'Their signature oolong-green blend', tier: 'regular' },
   ],
   '迷客夏': [
-    { name: 'Fresh Milk Tea', nameZh: '珍珠紅茶拿鐵', description: 'Smooth black tea latte with real milk, not creamer', tier: 'first-timer' },
+    { name: 'Pearl Black Tea Latte', nameZh: '珍珠紅茶拿鐵', description: 'Smooth black tea latte with real milk, not creamer', tier: 'first-timer' },
     { name: 'Dajia Taro Fresh Milk', nameZh: '大甲芋頭鮮奶', description: 'Famous taro from Dajia region, creamy and thick', tier: 'first-timer' },
-    { name: 'Grape Fruit Green', nameZh: '葡萄柚綠', description: 'Real grapefruit pulp with green tea', tier: 'regular' },
+    { name: 'Genmaicha Matcha Latte', nameZh: '玄米抹茶乳香拿鐵', description: 'Roasted rice tea with matcha and milk', tier: 'regular' },
   ],
   '珍煮丹': [
     { name: 'Brown Sugar Pearl Milk', nameZh: '黑糖珍珠鮮奶', description: 'The famous tiger stripe brown sugar boba', tier: 'first-timer' },
-    { name: 'Dirty Brown Sugar Tea', nameZh: '髒髒珍珠鮮奶茶', description: 'Brown sugar layered with milk tea base', tier: 'regular' },
+    { name: 'Thai Tea Latte', description: 'Rich Thai tea with fresh milk - their second best seller', tier: 'regular' },
   ],
   '茶的魔手': [
-    { name: 'Green Tea Latte', nameZh: '翡翠拿鐵', description: 'Fresh green tea with milk, light and clean', tier: 'first-timer' },
-    { name: 'Lemon Aiyu', nameZh: '檸檬愛玉', description: 'Lemon with aiyu jelly - classic Taiwanese refresher', tier: 'regular' },
+    { name: 'Hawthorn Oolong', nameZh: '山楂烏龍', description: 'Their #1 best seller - tart hawthorn with smooth oolong', tier: 'first-timer' },
+    { name: 'Earl Grey Fresh Milk Tea', nameZh: '伯爵鮮奶茶', description: 'Fragrant bergamot tea with fresh milk', tier: 'first-timer' },
+    { name: 'Fresh Milk Pu-erh', nameZh: '鮮奶普洱', description: 'Earthy pu-erh with creamy fresh milk', tier: 'regular' },
   ],
   '可不可熟成紅茶': [
     { name: 'Aged Black Tea Latte', nameZh: '熟成紅茶拿鐵', description: 'Their signature aged tea with fresh milk', tier: 'first-timer' },
-    { name: 'Aged Oolong Latte', nameZh: '熟成烏龍拿鐵', description: 'Roasted oolong flavor, less sweet', tier: 'regular' },
+    { name: 'Aged Cold Dew', nameZh: '熟成冷露', description: 'Winter melon + black tea, their signature cold drink', tier: 'regular' },
   ],
   '麻古茶坊': [
-    { name: 'Mango Smoothie', nameZh: '芒果牛奶冰沙', description: 'Real mango blended with fresh milk', tier: 'first-timer' },
-    { name: 'Grape Fruit Green Tea', nameZh: '葡萄柚綠茶', description: 'Fresh grapefruit pulp in green tea base', tier: 'regular' },
+    { name: 'Cheese Jinxuan Double Q', nameZh: '芝芝金萱雙Q', description: 'Cheese foam over Jinxuan tea with two chewy toppings - their signature', tier: 'first-timer' },
+    { name: 'Passion Fruit Double Q', nameZh: '百香雙Q果', description: 'Fresh passion fruit pulp with tapioca and coconut jelly', tier: 'regular' },
   ],
   '龜記': [
-    { name: 'Winter Melon Tea', nameZh: '冬瓜茶', description: 'Classic Taiwanese winter melon, caramel-sweet', tier: 'first-timer' },
-    { name: 'Winter Melon Lemon', nameZh: '冬瓜檸檬', description: 'Sweet melon meets citrus tang', tier: 'regular' },
+    { name: 'Red Grapefruit Jade Green Tea', nameZh: '紅柚翡翠', description: 'Their #1 on Dcard - fresh grapefruit with jade green tea', tier: 'first-timer' },
+    { name: 'Apple Red Xuan', nameZh: '蘋果紅萱', description: 'Apple paired with red oolong, their #2 best seller', tier: 'regular' },
   ],
   '得正': [
     { name: 'Black Tea', nameZh: '紅茶', description: 'Simple, well-brewed black tea with clean flavor', tier: 'first-timer' },
@@ -74,27 +78,27 @@ const DRINK_RECS: Record<string, Drink[]> = {
   // === INTERNATIONAL CHAINS ===
   'Tiger Sugar': [
     { name: 'Brown Sugar Boba + Pearl Milk', nameZh: '黑糖波霸厚鮮奶', description: 'The iconic tiger stripe drink that started the trend', tier: 'first-timer' },
+    { name: 'Brown Sugar Boba + Cream Mousse', nameZh: '黑糖波霸奶蓋', description: 'Tiger stripes topped with salt-sweet cream mousse, their #2', tier: 'first-timer' },
     { name: 'Brown Sugar Boba + Tea Latte', nameZh: '黑糖波霸鮮奶茶', description: 'Tiger stripes with a tea base - more balanced', tier: 'regular' },
-    { name: 'Cream Mousse Brown Sugar', nameZh: '黑糖奶蓋', description: 'Add cream mousse topping for salt-sweet contrast', tier: 'regular' },
   ],
   'Gong Cha': [
-    { name: 'Earl Grey Milk Tea', description: 'Fragrant bergamot milk tea, their bestseller', tier: 'first-timer' },
-    { name: 'Dirty Brown Sugar Milk Tea', description: 'Caramelized brown sugar with fresh milk', tier: 'first-timer' },
-    { name: 'Strawberry Yogurt', description: 'Fruit tea with yogurt base, refreshing', tier: 'regular' },
+    { name: 'Brown Sugar Milk Tea with Pearls', description: 'Their verified #1 best seller', tier: 'first-timer' },
+    { name: 'Pearl Milk Tea', description: 'The classic - consistently good across all locations', tier: 'first-timer' },
+    { name: 'Milk Foam Earl Grey', description: 'From their signature milk foam series, fragrant bergamot', tier: 'regular' },
   ],
   'Kung Fu Tea': [
-    { name: 'Kung Fu Milk Tea', description: 'Classic Hong Kong style milk tea, rich and bold', tier: 'first-timer' },
+    { name: 'Kung Fu Milk Tea', description: 'Their signature blend - rich and bold', tier: 'first-timer' },
     { name: 'Taro Milk Tea', description: 'Creamy taro that is consistently good', tier: 'first-timer' },
     { name: 'Passion Fruit Green Tea', description: 'Tangy fruit tea, great for non-milk-tea drinkers', tier: 'regular' },
   ],
   'Sharetea': [
-    { name: 'Classic Pearl Milk Tea', nameZh: '珍珠奶茶', description: 'Their flagship drink, reliable and creamy', tier: 'first-timer' },
-    { name: 'Taro Milk Tea', nameZh: '芋頭奶茶', description: 'Smooth, sweet purple taro', tier: 'first-timer' },
-    { name: 'Peach Oolong Tea', description: 'Fruity and fragrant, light option', tier: 'regular' },
+    { name: 'Wintermelon Milk Tea', nameZh: '冬瓜奶茶', description: 'Their verified best seller - caramel-sweet melon with milk tea', tier: 'first-timer' },
+    { name: 'Classic Pearl Milk Tea', nameZh: '珍珠奶茶', description: 'Reliable and creamy, a safe first order', tier: 'first-timer' },
+    { name: 'Mango Green Tea', nameZh: '芒果綠茶', description: 'Fresh mango with green tea, fruity and light', tier: 'regular' },
   ],
   'The Alley': [
     { name: 'Deerioca Fresh Milk', nameZh: '鹿丸鮮奶', description: 'Signature tapioca pearls with fresh milk, brown sugar swirl', tier: 'first-timer' },
-    { name: 'Royal No.9 Milk Tea', description: 'Premium black tea blend with creamer', tier: 'regular' },
+    { name: 'No. 3 Alley Milk Tea', description: 'Their verified second best seller, premium tea blend', tier: 'regular' },
   ],
   'Yi Fang Taiwan Fruit Tea': [
     { name: 'Pineapple Green Tea', nameZh: '鳳梨綠茶', description: 'Fresh pineapple juice with green tea, signature drink', tier: 'first-timer' },
@@ -102,12 +106,12 @@ const DRINK_RECS: Record<string, Drink[]> = {
     { name: 'Aiyu Lemon', nameZh: '愛玉檸檬', description: 'Taiwanese aiyu jelly with fresh lemon', tier: 'regular' },
   ],
   'Xing Fu Tang': [
-    { name: 'Brown Sugar Boba Milk', nameZh: '黑糖珍珠鮮奶', description: 'Hand-stirred brown sugar pearls made fresh in-store', tier: 'first-timer' },
-    { name: 'Taro Boba Milk', nameZh: '芋圓鮮奶', description: 'Taro with their signature brown sugar pearls', tier: 'regular' },
+    { name: 'Brown Sugar Boba Milk', nameZh: '黑糖珍珠鮮奶', description: 'Flame-torched wok brown sugar pearls, made fresh in-store', tier: 'first-timer' },
+    { name: 'Brown Sugar Pearl + Herbal Jelly Milk', nameZh: '黑糖珍珠仙草鮮奶', description: 'Their brown sugar pearls with herbal jelly and fresh milk', tier: 'regular' },
   ],
   'TP Tea': [
     { name: 'Tieguanyin Tea Latte', nameZh: '鐵觀音拿鐵', description: 'Roasted oolong with fresh milk - their star drink', tier: 'first-timer' },
-    { name: 'Plum Oolong', nameZh: '梅の烏龍', description: 'Plum-infused oolong, tart and fragrant', tier: 'regular' },
+    { name: 'Osmanthus Green Tea', nameZh: '桂花綠茶', description: 'Floral osmanthus with green tea, light and fragrant', tier: 'regular' },
   ],
   'Ten Ren': [
     { name: '913 King\'s Oolong Milk Tea', nameZh: '913茶王奶茶', description: 'Their iconic high-mountain oolong milk tea', tier: 'first-timer' },
@@ -133,8 +137,9 @@ const DRINK_RECS: Record<string, Drink[]> = {
 
   // === SINGAPORE BRANDS ===
   'KOI Thé': [
-    { name: 'Golden Oolong Macchiato', description: 'Their signature - oolong with milk foam cap', tier: 'first-timer' },
-    { name: 'Hazelnut Pearl Milk Tea', description: 'Nutty milk tea with chewy pearls', tier: 'regular' },
+    { name: 'Brown Sugar Milk Tea', description: 'Their verified #1 best seller', tier: 'first-timer' },
+    { name: 'Golden Bubble Milk Tea', description: 'Their signature golden oolong with bubbles', tier: 'first-timer' },
+    { name: 'Honey Green Tea', description: 'Light and refreshing, a popular lighter option', tier: 'regular' },
   ],
   'LiHO Tea': [
     { name: 'Brown Sugar Pearl Milk', description: 'Singapore\'s take on brown sugar boba', tier: 'first-timer' },
@@ -145,16 +150,16 @@ const DRINK_RECS: Record<string, Drink[]> = {
     { name: 'Mango Cheese Tea', nameZh: '芝士芒芒', description: 'Fresh mango with cheese foam on tea base', tier: 'regular' },
   ],
   'Chagee': [
-    { name: 'Boya Bindung Latte', nameZh: '伯牙絕弦', description: 'Their viral drink - jasmine green tea latte', tier: 'first-timer' },
-    { name: 'Light Oolong Tea', nameZh: '原葉鮮沏', description: 'Pure brewed oolong, no sugar', tier: 'regular' },
+    { name: 'Boya Bindung Latte', nameZh: '伯牙絕弦', description: 'Their mega-seller (60-70% of all sales) - jasmine green tea latte. Note: Chagee does not offer boba toppings', tier: 'first-timer' },
+    { name: 'Tie Guan Yin Milk Tea', nameZh: '鐵觀音奶茶', description: 'Roasted oolong milk tea, a popular alternative', tier: 'regular' },
   ],
   'R&B Tea': [
     { name: 'Brown Sugar Pearl Fresh Milk', nameZh: '黑糖珍珠鮮奶', description: 'Flame-torched brown sugar with fresh milk', tier: 'first-timer' },
     { name: 'Cheese Fresh Milk Tea', description: 'Cheese foam on black tea latte', tier: 'regular' },
   ],
   'PlayMade': [
-    { name: 'Earl Grey Milk Tea', description: 'Made with handmade pearls in various flavors', tier: 'first-timer' },
-    { name: 'Pick Your Pearls', description: 'Choose from 8+ pearl flavors - strawberry, charcoal, etc.', tier: 'regular' },
+    { name: 'Earl Grey Milk Tea with Strawberry Pearls', description: 'Their signature handmade flavored pearls with earl grey', tier: 'first-timer' },
+    { name: 'Brown Sugar Pearl Milk', description: 'Brown sugar with your choice of 8+ handmade pearl flavors', tier: 'regular' },
   ],
   'Each A Cup': [
     { name: 'Pearl Milk Tea', description: 'Classic Singaporean-style boba, consistent quality', tier: 'first-timer' },
@@ -165,7 +170,8 @@ const DRINK_RECS: Record<string, Drink[]> = {
   '7 Leaves Cafe': [
     { name: 'Mung Bean Milk Tea', description: 'Vietnamese-inspired - earthy mung bean with milk tea', tier: 'first-timer' },
     { name: 'Taro Milk Tea', description: 'Creamy and purple, a fan favorite', tier: 'first-timer' },
-    { name: 'Sea Cream Jasmine', description: 'Jasmine tea with salted cream foam', tier: 'regular' },
+    { name: 'Sea Cream Tea Jasmine', description: 'Jasmine tea with salted cream foam', tier: 'regular' },
+    { name: 'Thai Tea', description: 'One of their most popular - classic Thai tea flavor', tier: 'regular' },
   ],
   'Sunright Tea Studio': [
     { name: 'Dong Ding Oolong Milk Tea', nameZh: '凍頂烏龍奶茶', description: 'Premium Taiwanese oolong with fresh milk', tier: 'first-timer' },
