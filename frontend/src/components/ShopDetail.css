@@ -4,6 +4,12 @@
   gap: 16px;
 }
 
+.shop-detail-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .shop-detail-back {
   background: none;
   border: none;
@@ -17,6 +23,42 @@
 
 .shop-detail-back:hover {
   text-decoration: underline;
+}
+
+.shop-detail-top-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.shop-detail-fav {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.shop-detail-fav.is-fav {
+  color: #ef4444;
+}
+
+.shop-detail-share {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.shop-detail-share:hover {
+  background: var(--border);
 }
 
 .shop-detail-photo {

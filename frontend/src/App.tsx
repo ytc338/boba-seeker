@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import HomePage from './pages/HomePage';
+import ShopPage from './pages/ShopPage';
 import ContactPage from './pages/ContactPage';
 import './App.css';
 
@@ -21,6 +22,7 @@ function App() {
         <main role="main">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/shop/:id" element={<ShopPage />} />
             <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>

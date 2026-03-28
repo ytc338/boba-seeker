@@ -5,16 +5,20 @@ interface ShopCardProps {
   shop: Shop;
   isSelected?: boolean;
   onClick?: () => void;
+  isFavorite?: boolean;
 }
 
-export default function ShopCard({ shop, isSelected, onClick }: ShopCardProps) {
+export default function ShopCard({ shop, isSelected, onClick, isFavorite }: ShopCardProps) {
   return (
     <div
       className={`shop-card ${isSelected ? 'selected' : ''}`}
       onClick={onClick}
     >
       <div className="shop-card-header">
-        <h3 className="shop-name">{shop.name}</h3>
+        <h3 className="shop-name">
+          {isFavorite && <span className="shop-fav-icon">♥</span>}
+          {shop.name}
+        </h3>
         {shop.rating && (
           <div className="shop-rating">
             <span className="star">★</span>

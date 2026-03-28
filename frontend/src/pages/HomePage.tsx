@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { Shop, Brand } from '../types';
 import { getNearbyShops, getBrands, searchShops } from '../services/api';
+import { useFavorites } from '../hooks/useFavorites';
 import Map from '../components/Map';
 import FilterPanel from '../components/FilterPanel';
 import BottomSheet from '../components/BottomSheet';
@@ -56,6 +57,9 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Shop[] | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
+
+  // Favorites
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   // Roulette state
   const location = useLocation();
@@ -320,6 +324,8 @@ export default function HomePage() {
         searchLoading={searchLoading}
         onSearchClear={handleSearchClear}
         isSearchActive={searchResults !== null}
+        isFavorite={isFavorite}
+        onToggleFavorite={toggleFavorite}
       />
     </div>
   );

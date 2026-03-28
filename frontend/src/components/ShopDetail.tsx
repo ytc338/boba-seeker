@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Shop } from '../types';
 import DrinkRec from './DrinkRec';
 import './ShopDetail.css';
@@ -5,6 +6,9 @@ import './ShopDetail.css';
 interface ShopDetailProps {
   shop: Shop;
   onBack: () => void;
+  backLabel?: string;
+  isFavorite?: boolean;
+  onToggleFavorite?: (shopId: number) => void;
 }
 
 function getGoogleMapsUrl(shop: Shop): string {
@@ -43,14 +47,50 @@ function parseHours(hours: string | undefined): string[] | null {
   }
 }
 
-export default function ShopDetail({ shop, onBack }: ShopDetailProps) {
+export default function ShopDetail({ shop, onBack, backLabel = 'Back to list', isFavorite, onToggleFavorite }: ShopDetailProps) {
   const hoursLines = parseHours(shop.hours);
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/shop/${shop.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback: select a temporary input
+      const input = document.createElement('input');
+      input.value = url;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   return (
     <div className="shop-detail">
-      <button className="shop-detail-back" onClick={onBack}>
-        ← Back to list
-      </button>
+      <div className="shop-detail-top-bar">
+        <button className="shop-detail-back" onClick={onBack}>
+          ← {backLabel}
+        </button>
+        <div className="shop-detail-top-actions">
+          {onToggleFavorite && (
+            <button
+              className={`shop-detail-fav ${isFavorite ? 'is-fav' : ''}`}
+              onClick={() => onToggleFavorite(shop.id)}
+              title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            >
+              {isFavorite ? '♥' : '♡'}
+            </button>
+          )}
+          <button className="shop-detail-share" onClick={handleShare}>
+            {copied ? 'Copied!' : 'Share'}
+          </button>
+        </div>
+      </div>
 
       {shop.photo_url && (
         <div className="shop-detail-photo">

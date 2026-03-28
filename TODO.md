@@ -1,29 +1,33 @@
 # Boba Seeker - Product Roadmap
 
-> **Philosophy**: Build something actually useful first, polish later.
+> **Vision**: The boba-literate map — not just where to find it, but what to order when you get there.
 
 ## ✅ Completed Features
 - [x] Map display with Mapbox GL JS
 - [x] Shop markers with custom boba icon
 - [x] "Search This Area" lazy loading
 - [x] Multi-select brand filtering
-- [x] User geolocation with fallback to Taipei
-- [x] Backend API (FastAPI + SQLite)
+- [x] User geolocation with fallback
+- [x] Backend API (FastAPI + PostgreSQL)
 - [x] Docker containerization
 - [x] Seed data for initial shops
+- [x] Real shop data import via Google Places API
 - [x] Singapore location data
-- [x] Drink recommendations component
-
----
-
-## 🔥 Phase 1: Make It Actually Usable
-
-These are blockers for real daily use.
-
-- [x] **Real shop data import** - Import actual Taiwan boba shops via Google Places API
-- [ ] **Directions button** - "Open in Google Maps" when viewing a shop
-- [ ] **Search by name** - Quick search for shop/brand names
-- [ ] **Shop detail panel** - View hours, phone, address, rating on click
+- [x] US location data (LA, SF, NYC, Seattle, Houston, Chicago, Honolulu)
+- [x] Roulette / "Feeling Lucky" feature
+- [x] Contact / feedback form (Gmail SMTP)
+- [x] CI/CD pipeline (GitHub Actions)
+- [x] Structured logging
+- [x] Pre-commit linting (ruff, eslint)
+- [x] **Shop detail panel** — hours, phone, photo, rating, address, brand info
+- [x] **Directions button** — "Directions" and "View on Google Maps" buttons
+- [x] **Search by name** — search bar in bottom sheet, uses /api/shops/search
+- [x] **Drink recommendations** — 30+ brands with "Start here" / "For regulars" tiers
+- [x] **Shareable shop URLs** — /shop/:id permalink pages with detail + map
+- [x] **Share button** — copy shop link to clipboard
+- [x] **Save favorites** — localStorage-based, heart toggle on detail + list
+- [x] **PWA support** — manifest, service worker, installable on mobile
+- [x] **Singapore country display** — fixed missing SG flag in shop cards
 
 ---
 
@@ -31,25 +35,21 @@ These are blockers for real daily use.
 
 Makes daily use smoother.
 
-- [ ] **Custom icon** - Custom icon for each brand
-- [ ] **Save favorites** - Bookmark shops locally (no login needed)
-- [ ] **Map clustering** - Group markers when zoomed out
-- [ ] **Sort options** - Sort by distance, rating
-- [ ] **List view toggle** - Alternative to map view
-- [ ] **Price range filter** - Filter by $ / $$ / $$$
-- [ ] **Open now filter** - Filter to only show currently open shops
+- [ ] **Custom icon** — Custom icon for each brand on map markers
+- [ ] **Map clustering** — Group markers when zoomed out
+- [ ] **Sort options** — Sort by distance, rating
+- [ ] **List view toggle** — Alternative to map view
+- [ ] **Price range filter** — Filter by $ / $$ / $$$
+- [ ] **Open now filter** — Filter to only show currently open shops
 
 ---
 
 ## 💡 Phase 3: Expand & Share
 
-Once it works well for you, share with others.
-
-- [x] **US location data** - Add major US cities (LA, SF, NYC)
-- [ ] **Mobile responsiveness** - Bottom sheet, collapsible sidebar
-- [ ] **Share shop** - Copy link to specific shop
-- [ ] **Language toggle** - English/Chinese interface
-- [ ] **PWA support** - Install as app
+- [ ] **Language toggle** — English/Chinese interface
+- [ ] **Brand profile pages** — /brand/:slug with all locations across countries
+- [ ] **City-specific boba guides** — Shareable filtered map views
+- [ ] **Roulette share card** — "Boba Seeker picked this for me" image card
 
 ---
 
@@ -57,14 +57,14 @@ Once it works well for you, share with others.
 
 When you have real users.
 
-- [ ] **User accounts** - Cloud sync favorites
-- [ ] **Submit a shop** - User contributions
-- [ ] **Admin dashboard** - Manage content
-- [ ] **CI/CD pipeline** - Automated deployments
-- [ ] **Database migrations** - Alembic setup
-- [ ] **Store checker** - Check if a shop is still open and new stores are added
-- [ ] **Rate limiting** - Implement rate limiting for API calls
-- [ ] **Cache** - Implement caching for API responses
+- [ ] **User accounts** — Cloud sync favorites
+- [ ] **Submit a shop** — User contributions
+- [ ] **User-submitted drink recs** — Community recommendations
+- [ ] **Admin dashboard** — Manage content
+- [ ] **Database migrations** — Alembic setup
+- [ ] **Store checker** — Verify shops still open, detect new stores
+- [ ] **Rate limiting** — Implement rate limiting for API calls
+- [ ] **Cache** — Implement caching for API responses
 
 ---
 
@@ -75,15 +75,6 @@ When you have real users.
 ---
 
 ## 📝 Technical Debt (Do when it hurts)
-- [ ] Unit tests for backend API
 - [ ] E2E tests for frontend
-- [ ] Rate limiting for API
 - [ ] Better error handling
-
----
-
-## 🎯 Next Action
-
-**Start here → Import real shop data via Google Places API**
-
-Without real data, the app is just a tech demo.
+- [ ] Code splitting (JS bundle is ~2MB)

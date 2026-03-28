@@ -26,6 +26,8 @@ interface BottomSheetProps {
   searchLoading: boolean;
   onSearchClear: () => void;
   isSearchActive: boolean;
+  isFavorite?: (shopId: number) => boolean;
+  onToggleFavorite?: (shopId: number) => void;
 }
 
 export default function BottomSheet({
@@ -41,6 +43,8 @@ export default function BottomSheet({
   searchLoading,
   onSearchClear,
   isSearchActive,
+  isFavorite,
+  onToggleFavorite,
 }: BottomSheetProps) {
   const [sheetState, setSheetState] = useState<SheetState>('peek');
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -213,6 +217,8 @@ export default function BottomSheet({
           <ShopDetail
             shop={selectedShop}
             onBack={() => onShopSelect(null)}
+            isFavorite={isFavorite?.(selectedShop.id)}
+            onToggleFavorite={onToggleFavorite}
           />
         ) : (
           <div className="sheet-shop-list">
@@ -230,6 +236,7 @@ export default function BottomSheet({
                 shop={shop}
                 isSelected={false}
                 onClick={() => onShopSelect(shop)}
+                isFavorite={isFavorite?.(shop.id)}
               />
             ))}
           </div>

@@ -43,6 +43,11 @@ export async function getNearbyShops(
   return response.data;
 }
 
+export async function getBrand(id: number): Promise<Brand> {
+  const response = await api.get(`/api/brands/${id}`);
+  return response.data;
+}
+
 export async function getBrands(country?: string): Promise<Brand[]> {
   const response = await api.get('/api/brands', {
     params: country ? { country } : undefined
