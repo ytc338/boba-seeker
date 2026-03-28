@@ -42,13 +42,13 @@
 }
 
 .shop-detail-fav.is-fav {
-  color: #ef4444;
+  color: var(--favorite-color);
 }
 
 .shop-detail-share {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   padding: 4px 10px;
   font-size: 0.8rem;
   font-weight: 500;
@@ -62,7 +62,7 @@
 }
 
 .shop-detail-photo {
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   max-height: 200px;
 }
@@ -82,8 +82,9 @@
 }
 
 .shop-detail-name {
+  font-family: var(--font-heading);
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--text-primary);
   margin: 0;
   line-height: 1.3;
@@ -99,7 +100,7 @@
 }
 
 .shop-detail-rating .star {
-  color: #f59e0b;
+  color: var(--star-color);
 }
 
 .shop-detail-rating .rating-count {
@@ -117,17 +118,18 @@
   background: var(--accent-light);
   color: var(--accent);
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.8rem;
   font-weight: 500;
 }
 
 .shop-detail-country {
-  background: var(--bg-secondary);
+  background: var(--accent2-light);
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: var(--accent2);
+  font-weight: 500;
 }
 
 /* Action buttons */
@@ -145,15 +147,15 @@
   padding: 10px 16px;
   background: var(--accent);
   color: white;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 600;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
 }
 
 .shop-detail-directions:hover {
-  opacity: 0.9;
+  background: var(--accent-hover);
 }
 
 .shop-detail-gmaps {
@@ -163,18 +165,18 @@
   justify-content: center;
   gap: 6px;
   padding: 10px 16px;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  background: var(--accent2);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
   text-decoration: none;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   transition: background 0.2s;
 }
 
 .shop-detail-gmaps:hover {
-  background: var(--border);
+  background: #27b0a3;
 }
 
 /* Info section */
@@ -184,7 +186,7 @@
   gap: 12px;
   padding: 12px;
   background: var(--bg-secondary);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .info-label {

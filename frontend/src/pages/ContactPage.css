@@ -11,19 +11,18 @@
 }
 
 .contact-header h1 {
+  font-family: var(--font-heading);
   font-size: 2.5rem;
+  font-weight: 400;
+  color: var(--accent);
   margin-bottom: 16px;
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .contact-form {
   background: var(--card-bg);
   padding: 32px;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
 }
 
@@ -42,7 +41,7 @@
   width: 100%;
   padding: 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-family: inherit;
   font-size: 1rem;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -65,15 +64,15 @@ textarea.form-control {
   background: var(--accent);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: background 0.2s;
 }
 
 .btn-submit:hover {
-  opacity: 0.9;
+  background: var(--accent-hover);
 }
 
 .btn-submit:disabled {
@@ -83,18 +82,18 @@ textarea.form-control {
 
 .alert {
   padding: 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   margin-bottom: 24px;
 }
 
 .alert-success {
-  background-color: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
+  background-color: #E8F5E0;
+  color: #2D5A1E;
+  border: 1px solid #C5E4B8;
 }
 
 .alert-error {
-  background-color: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
+  background-color: #FCEAE8;
+  color: #8B2520;
+  border: 1px solid #F5C9C4;
 }

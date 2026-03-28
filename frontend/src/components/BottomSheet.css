@@ -4,10 +4,9 @@
   left: 0;
   right: 0;
   z-index: 80;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  background: var(--card-bg);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: 0 -2px 12px rgba(44, 36, 32, 0.08);
   transition: max-height 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -59,8 +58,9 @@
 }
 
 .sheet-title {
-  font-weight: 600;
-  font-size: 1rem;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 1.05rem;
   color: var(--text-primary);
 }
 
@@ -82,7 +82,7 @@
   flex: 1;
   padding: 8px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 0.875rem;
   background: var(--bg-secondary);
   color: var(--text-primary);
@@ -136,7 +136,7 @@
     width: 380px;
     top: 16px;
     bottom: 16px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     max-height: none;
     height: auto;
   }

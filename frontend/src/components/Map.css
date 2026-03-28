@@ -12,7 +12,7 @@
 .map-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: var(--bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,26 +22,28 @@
 .map-overlay-content {
   text-align: center;
   padding: 32px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 .map-overlay-content h3 {
+  font-family: var(--font-heading);
+  font-weight: 400;
   margin: 0 0 12px 0;
   font-size: 1.5rem;
 }
 
 .map-overlay-content p {
   margin: 0 0 8px 0;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .map-overlay-content code {
   display: block;
   padding: 8px 12px;
-  background: #f1f5f9;
-  border-radius: 6px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
   font-size: 0.85rem;
 }
 
@@ -53,10 +55,10 @@
   z-index: 10;
   width: 30px;
   height: 30px;
-  background: white;
+  background: var(--card-bg);
   border: none;
-  border-radius: 4px;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 2px rgba(44, 36, 32, 0.1);
   cursor: pointer;
   font-size: 16px;
   display: flex;
@@ -66,7 +68,7 @@
 }
 
 .locate-button:hover {
-  background: #f0f0f0;
+  background: var(--bg-secondary);
 }
 
 .locate-button:disabled {
@@ -88,21 +90,21 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
-  background: white;
+  background: var(--card-bg);
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   padding: 10px 20px;
   font-size: 14px;
   font-weight: 500;
-  color: #1e293b;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .search-area-button:hover {
-  background: #f8fafc;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-lg);
 }
 
 .search-area-button:disabled {
@@ -122,21 +124,22 @@
 
 /* Popup styling */
 .marker-popup h4 {
+  font-family: var(--font-heading);
+  font-weight: 400;
   margin: 0 0 4px 0;
   font-size: 0.95rem;
-  font-weight: 600;
 }
 
 .marker-popup p {
   margin: 0;
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .mapboxgl-popup-content {
   padding: 12px 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 .mapboxgl-popup-close-button {
@@ -148,7 +151,7 @@
   display: inline-block;
   margin-top: 8px;
   font-size: 0.8rem;
-  color: #c2185b;
+  color: var(--accent);
   text-decoration: none;
   font-weight: 500;
 }

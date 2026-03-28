@@ -1,20 +1,8 @@
-/* CSS Variables */
-:root {
-  --accent: #e91e63;
-  --accent-light: rgba(233, 30, 99, 0.15);
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --border: #e2e8f0;
-}
-
 /* Map-first layout */
 .home-page.map-first {
   position: relative;
   width: 100%;
-  height: calc(100vh - 72px);
+  height: calc(100vh - var(--header-height));
   overflow: hidden;
 }
 
@@ -28,9 +16,9 @@
 .error {
   text-align: center;
   padding: 20px;
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-  border-radius: 8px;
+  color: #8B2520;
+  background: #FCEAE8;
+  border-radius: var(--radius-md);
   margin: 8px 0;
 }
 

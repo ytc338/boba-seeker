@@ -3,30 +3,31 @@
   top: 80px; /* Below header */
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--card-bg);
   padding: 12px 24px;
-  border-radius: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   z-index: 1000;
   display: flex;
   align-items: center;
   gap: 12px;
   pointer-events: none; /* Let clicks pass through to map */
   transition: all 0.3s ease;
-  border: 2px solid var(--primary-color, #e91e63);
+  border: 2px solid var(--accent);
 }
 
 .roulette-label {
   font-weight: 600;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .roulette-shop-name {
-  font-weight: 800;
-  color: var(--primary-color, #e91e63);
+  font-family: var(--font-heading);
+  font-weight: 400;
+  color: var(--accent);
   font-size: 1.1rem;
   min-width: 150px;
   text-align: center;

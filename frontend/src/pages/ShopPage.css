@@ -1,7 +1,7 @@
 .shop-page {
   position: relative;
   width: 100%;
-  height: calc(100vh - 72px);
+  height: calc(100vh - var(--header-height));
   display: flex;
   flex-direction: column;
 }

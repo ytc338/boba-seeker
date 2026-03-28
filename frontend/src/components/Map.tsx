@@ -101,7 +101,7 @@ export default function Map({
           source: 'shops',
           paint: {
             'circle-radius': 8,
-            'circle-color': '#e91e63',
+            'circle-color': '#FF6B6B',
             'circle-stroke-width': 2,
             'circle-stroke-color': '#ffffff',
           },
@@ -114,7 +114,7 @@ export default function Map({
           source: 'shops',
           paint: {
             'circle-radius': 14,
-            'circle-color': '#ffb300', // Gold/Yellow for "jumping"
+            'circle-color': '#FFBE0B', // Bright yellow for roulette
             'circle-stroke-width': 4,
             'circle-stroke-color': '#ffffff',
           },
@@ -128,7 +128,7 @@ export default function Map({
           source: 'shops',
           paint: {
             'circle-radius': 12,
-            'circle-color': '#c2185b',
+            'circle-color': '#E85D5D',
             'circle-stroke-width': 3,
             'circle-stroke-color': '#ffffff',
           },
