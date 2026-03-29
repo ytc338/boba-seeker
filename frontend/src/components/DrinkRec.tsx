@@ -167,6 +167,11 @@ const DRINK_RECS: Record<string, Drink[]> = {
   ],
 
   // === US REGIONAL ===
+  "BenGong's Tea": [
+    { name: 'Tiramisu Milk Tea', nameZh: '提拉米苏御制奶茶', description: 'Milk tea with torched crème brûlée cream cap - a crowd favorite', tier: 'first-timer' },
+    { name: 'Strawberry Cream Slush', nameZh: '元气莓莓雪芙', description: 'Fresh strawberry blended slush with cream, their signature', tier: 'first-timer' },
+    { name: 'Brown Sugar Boba Milk Tea', description: 'Hand-made brown sugar with Taiwanese hand-made boba', tier: 'regular' },
+  ],
   '7 Leaves Cafe': [
     { name: 'Mung Bean Milk Tea', description: 'Vietnamese-inspired - earthy mung bean with milk tea', tier: 'first-timer' },
     { name: 'Taro Milk Tea', description: 'Creamy and purple, a fan favorite', tier: 'first-timer' },
@@ -274,6 +279,9 @@ const BRAND_ALIASES: Record<string, string> = {
   // Moge Tee
   'Moge': 'Moge Tee',
   '愿茶': 'Moge Tee',
+  // BenGong's Tea
+  '本宮的茶': "BenGong's Tea",
+  'BenGongs Tea': "BenGong's Tea",
   // 7 Leaves
   '7 Leaves': '7 Leaves Cafe',
   'Seven Leaves': '7 Leaves Cafe',
@@ -295,6 +303,9 @@ function lookupDrinks(brandName?: string): Drink[] {
 export default function DrinkRec({ brandName }: DrinkRecProps) {
   const drinks = lookupDrinks(brandName);
   const hasMatch = brandName && drinks !== DRINK_RECS['default'];
+
+  // Don't render anything if we don't have verified recs for this brand
+  if (!hasMatch) return null;
 
   const firstTimerDrinks = drinks.filter(d => d.tier === 'first-timer');
   const regularDrinks = drinks.filter(d => d.tier === 'regular');

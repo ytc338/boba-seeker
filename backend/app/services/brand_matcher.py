@@ -66,6 +66,7 @@ BRAND_ALIASES = {
     "Tea Top": ["TeaTop", "Tea-Top"],
     "Happy Lemon": ["Happy Lemon", "快樂檸檬"],
     "Boba Guys": ["Boba Guys"],
+    "BenGong's Tea": ["BenGong", "Ben Gong", "本宮的茶", "本宮茶"],
     # Taiwan Specific
     "龜記": ["龜記", "Guiji", "GUIJI", "龜記茗品"],
     "清心福全": ["清心", "清心福全"],

@@ -136,6 +136,12 @@ NATIONAL_BRANDS = [
     {"name": "Moge Tee", "name_zh": "愿茶", "aliases": [], "origin_country": "CN"},
     {"name": "Meet Fresh", "name_zh": "鮮芋仙", "aliases": [], "origin_country": "TW"},
     {
+        "name": "BenGong's Tea",
+        "name_zh": "本宮的茶",
+        "aliases": ["BenGong", "Ben Gong"],
+        "origin_country": "TW",
+    },
+    {
         "name": "Wushiland Boba",
         "name_zh": "50嵐",
         "aliases": ["OO Tea", "50 Lan"],
