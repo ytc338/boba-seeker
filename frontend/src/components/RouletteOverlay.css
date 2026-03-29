@@ -54,3 +54,75 @@
   50% { transform: scale(1.1); opacity: 1; }
   100% { transform: scale(1); opacity: 0.8; }
 }
+
+/* Result state after roulette completes */
+.roulette-result {
+  flex-direction: column;
+  text-align: center;
+  padding: 20px 32px;
+  pointer-events: auto;
+  gap: 8px;
+  position: relative;
+  max-width: 320px;
+  width: auto;
+}
+
+.roulette-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.roulette-close:hover {
+  color: var(--text-primary);
+}
+
+.roulette-result-icon {
+  font-size: 2rem;
+}
+
+.roulette-result-name {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+}
+
+.roulette-result-brand {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.roulette-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.roulette-share-btn,
+.roulette-view-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.roulette-share-btn {
+  background: var(--accent);
+  color: white;
+}
+
+.roulette-view-btn {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}

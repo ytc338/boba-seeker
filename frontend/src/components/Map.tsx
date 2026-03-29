@@ -88,17 +88,61 @@ export default function Map({
       map.current.on('load', () => {
         if (!map.current) return;
 
-        // Add GeoJSON source for shops
+        // Add GeoJSON source for shops with clustering
         map.current.addSource('shops', {
           type: 'geojson',
           data: { type: 'FeatureCollection', features: [] },
+          cluster: true,
+          clusterMaxZoom: 14,
+          clusterRadius: 50,
         });
 
-        // Simple circle markers
+        // Cluster circle layer
+        map.current.addLayer({
+          id: 'clusters',
+          type: 'circle',
+          source: 'shops',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': [
+              'step', ['get', 'point_count'],
+              '#FFB3B3', // < 10: light pink
+              10, '#FF6B6B', // 10-29: accent
+              30, '#E85D5D', // 30+: darker
+            ],
+            'circle-radius': [
+              'step', ['get', 'point_count'],
+              18,
+              10, 24,
+              30, 32,
+            ],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff',
+          },
+        });
+
+        // Cluster count label
+        map.current.addLayer({
+          id: 'cluster-count',
+          type: 'symbol',
+          source: 'shops',
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': ['get', 'point_count_abbreviated'],
+            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+            'text-size': 12,
+          },
+          paint: {
+            'text-color': '#ffffff',
+          },
+        });
+
+        // Individual (unclustered) shop markers
         map.current.addLayer({
           id: 'shop-markers',
           type: 'circle',
           source: 'shops',
+          filter: ['!', ['has', 'point_count']],
           paint: {
             'circle-radius': 8,
             'circle-color': '#FF6B6B',
@@ -114,11 +158,11 @@ export default function Map({
           source: 'shops',
           paint: {
             'circle-radius': 14,
-            'circle-color': '#FFBE0B', // Bright yellow for roulette
+            'circle-color': '#FFBE0B',
             'circle-stroke-width': 4,
             'circle-stroke-color': '#ffffff',
           },
-          filter: ['==', ['get', 'id'], -1], // Initially hide
+          filter: ['==', ['get', 'id'], -1],
         });
 
         // Highlight layer for selected marker
@@ -135,7 +179,22 @@ export default function Map({
           filter: ['==', ['get', 'id'], -1],
         });
 
-        // Click handler
+        // Click on cluster -> zoom in
+        map.current.on('click', 'clusters', (e) => {
+          if (!map.current || !e.features?.[0]) return;
+          const clusterId = e.features[0].properties?.cluster_id;
+          const source = map.current.getSource('shops') as mapboxgl.GeoJSONSource;
+          source.getClusterExpansionZoom(clusterId, (err: Error | null, zoom: number | null | undefined) => {
+            if (err || !map.current || zoom == null) return;
+            const geometry = e.features![0].geometry as GeoJSON.Point;
+            map.current.easeTo({
+              center: geometry.coordinates as [number, number],
+              zoom,
+            });
+          });
+        });
+
+        // Click on individual shop marker
         map.current.on('click', 'shop-markers', (e) => {
           if (!e.features?.[0]) return;
           const shopId = e.features[0].properties?.id;
@@ -145,7 +204,13 @@ export default function Map({
           }
         });
 
-        // Cursor on hover
+        // Cursor on hover for clusters and markers
+        map.current.on('mouseenter', 'clusters', () => {
+          if (map.current) map.current.getCanvas().style.cursor = 'pointer';
+        });
+        map.current.on('mouseleave', 'clusters', () => {
+          if (map.current) map.current.getCanvas().style.cursor = '';
+        });
         map.current.on('mouseenter', 'shop-markers', () => {
           if (map.current) map.current.getCanvas().style.cursor = 'pointer';
         });

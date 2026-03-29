@@ -93,3 +93,9 @@
   color: var(--accent2);
   font-weight: 500;
 }
+
+.shop-distance {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-left: auto;
+}

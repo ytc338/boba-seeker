@@ -1,4 +1,5 @@
 import type { Shop } from '../types';
+import { formatDistance } from '../utils/distance';
 import './ShopCard.css';
 
 interface ShopCardProps {
@@ -6,9 +7,10 @@ interface ShopCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   isFavorite?: boolean;
+  distance?: number;
 }
 
-export default function ShopCard({ shop, isSelected, onClick, isFavorite }: ShopCardProps) {
+export default function ShopCard({ shop, isSelected, onClick, isFavorite, distance }: ShopCardProps) {
   return (
     <div
       className={`shop-card ${isSelected ? 'selected' : ''}`}
@@ -39,6 +41,9 @@ export default function ShopCard({ shop, isSelected, onClick, isFavorite }: Shop
         <span className="shop-country">
           {shop.country === 'TW' ? '🇹🇼 Taiwan' : shop.country === 'SG' ? '🇸🇬 Singapore' : '🇺🇸 USA'}
         </span>
+        {distance != null && (
+          <span className="shop-distance">~{formatDistance(distance)}</span>
+        )}
       </div>
     </div>
   );

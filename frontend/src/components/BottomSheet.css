@@ -55,6 +55,24 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  gap: 8px;
+}
+
+.sort-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sort-toggle.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .sheet-title {
@@ -98,7 +116,7 @@
   color: var(--text-muted);
 }
 
-.search-clear {
+.sheet-search-clear {
   background: none;
   border: none;
   color: var(--accent);
@@ -109,7 +127,7 @@
   flex-shrink: 0;
 }
 
-.search-clear:hover {
+.sheet-search-clear:hover {
   text-decoration: underline;
 }
 

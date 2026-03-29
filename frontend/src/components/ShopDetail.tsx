@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import type { Shop } from '../types';
-import DrinkRec from './DrinkRec';
 import './ShopDetail.css';
+
+const DrinkRec = lazy(() => import('./DrinkRec'));
 
 interface ShopDetailProps {
   shop: Shop;
@@ -162,7 +163,9 @@ export default function ShopDetail({ shop, onBack, backLabel = 'Back to list', i
         )}
       </div>
 
-      <DrinkRec brandName={shop.brand?.name} />
+      <Suspense fallback={null}>
+        <DrinkRec brandName={shop.brand?.name} />
+      </Suspense>
     </div>
   );
 }

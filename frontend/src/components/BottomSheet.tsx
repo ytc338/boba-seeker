@@ -28,6 +28,10 @@ interface BottomSheetProps {
   isSearchActive: boolean;
   isFavorite?: (shopId: number) => boolean;
   onToggleFavorite?: (shopId: number) => void;
+  sortBy?: 'default' | 'distance';
+  onSortChange?: (sort: 'default' | 'distance') => void;
+  userLocation?: { lat: number; lng: number } | null;
+  shopDistances?: Record<number, number> | null;
 }
 
 export default function BottomSheet({
@@ -45,12 +49,17 @@ export default function BottomSheet({
   isSearchActive,
   isFavorite,
   onToggleFavorite,
+  sortBy,
+  onSortChange,
+  userLocation,
+  shopDistances,
 }: BottomSheetProps) {
   const [sheetState, setSheetState] = useState<SheetState>('peek');
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number>(0);
   const dragStartHeight = useRef<number>(0);
   const isDragging = useRef<boolean>(false);
+  const didDrag = useRef<boolean>(false);
 
   // Expand sheet when a shop is selected for detail view
   useEffect(() => {
@@ -78,8 +87,12 @@ export default function BottomSheet({
     return () => window.removeEventListener('resize', calculateHeight);
   }, [sheetState, onHeightChange]);
 
-  // Get next state when tapping header
+  // Get next state when tapping header (suppressed if a drag just occurred)
   const cycleState = useCallback(() => {
+    if (didDrag.current) {
+      didDrag.current = false;
+      return;
+    }
     setSheetState((prev) => {
       if (prev === 'collapsed') return 'peek';
       if (prev === 'peek') return 'expanded';
@@ -91,6 +104,7 @@ export default function BottomSheet({
   const handleDragStart = useCallback((clientY: number) => {
     if (!sheetRef.current) return;
     isDragging.current = true;
+    didDrag.current = false;
     dragStartY.current = clientY;
     dragStartHeight.current = sheetRef.current.offsetHeight;
     sheetRef.current.style.transition = 'none';
@@ -101,6 +115,9 @@ export default function BottomSheet({
     if (!isDragging.current || !sheetRef.current) return;
 
     const deltaY = dragStartY.current - clientY;
+    if (Math.abs(deltaY) > 5) {
+      didDrag.current = true;
+    }
     const newHeight = Math.max(72, Math.min(window.innerHeight * 0.7, dragStartHeight.current + deltaY));
     sheetRef.current.style.maxHeight = `${newHeight}px`;
   }, []);
@@ -192,6 +209,17 @@ export default function BottomSheet({
           <span className="shop-count">
             {loading || searchLoading ? 'Loading...' : `${shops.length} found`}
           </span>
+          {userLocation && onSortChange && (
+            <button
+              className={`sort-toggle ${sortBy === 'distance' ? 'active' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSortChange(sortBy === 'distance' ? 'default' : 'distance');
+              }}
+            >
+              {sortBy === 'distance' ? 'Nearest' : 'Sort by distance'}
+            </button>
+          )}
         </div>
       </div>
 
@@ -206,7 +234,7 @@ export default function BottomSheet({
           onKeyDown={handleSearchKeyDown}
         />
         {isSearchActive && (
-          <button className="search-clear" onClick={onSearchClear}>
+          <button className="sheet-search-clear" onClick={onSearchClear}>
             Clear
           </button>
         )}
@@ -237,6 +265,7 @@ export default function BottomSheet({
                 isSelected={false}
                 onClick={() => onShopSelect(shop)}
                 isFavorite={isFavorite?.(shop.id)}
+                distance={shopDistances?.[shop.id]}
               />
             ))}
           </div>

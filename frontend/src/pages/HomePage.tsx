@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import type { Shop, Brand } from '../types';
 import { getNearbyShops, getBrands, searchShops } from '../services/api';
 import { useFavorites } from '../hooks/useFavorites';
+import { haversineDistance } from '../utils/distance';
+import { generateShareCard } from '../utils/shareCard';
 import Map from '../components/Map';
 import FilterPanel from '../components/FilterPanel';
 import BottomSheet from '../components/BottomSheet';
@@ -44,6 +46,10 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // User location & sorting
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [sortBy, setSortBy] = useState<'default' | 'distance'>('default');
+
   // Map bounds for "Search This Area"
   const [mapBounds, setMapBounds] = useState<{
     minLat: number; maxLat: number; minLng: number; maxLng: number;
@@ -66,6 +72,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [rouletteState, setRouletteState] = useState<'idle' | 'spinning'>('idle');
   const [highlightedShopId, setHighlightedShopId] = useState<number | null>(null);
+  const [rouletteWinner, setRouletteWinner] = useState<Shop | null>(null);
 
   // Fetch brands when region changes
   useEffect(() => {
@@ -105,7 +112,10 @@ export default function HomePage() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        loadNearbyShops(position.coords.latitude, position.coords.longitude);
+        const loc = { lat: position.coords.latitude, lng: position.coords.longitude };
+        setUserLocation(loc);
+        setSortBy('distance');
+        loadNearbyShops(loc.lat, loc.lng);
       },
       () => {
         loadNearbyShops(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng);
@@ -152,16 +162,33 @@ export default function HomePage() {
     }
   }, [mapBounds]);
 
-  // Client-side filtering by brand
+  // Client-side filtering by brand, with optional distance sort
   const filteredShops = useMemo(() => {
     const base = searchResults ?? shops;
-    if (selectedBrands.length === 0) {
-      return base;
+    let result = selectedBrands.length === 0
+      ? base
+      : base.filter((shop) => shop.brand_id && selectedBrands.includes(shop.brand_id));
+
+    if (sortBy === 'distance' && userLocation) {
+      result = [...result].sort((a, b) => {
+        const distA = haversineDistance(userLocation, { lat: a.latitude, lng: a.longitude });
+        const distB = haversineDistance(userLocation, { lat: b.latitude, lng: b.longitude });
+        return distA - distB;
+      });
     }
-    return base.filter(
-      (shop) => shop.brand_id && selectedBrands.includes(shop.brand_id)
-    );
-  }, [shops, searchResults, selectedBrands]);
+
+    return result;
+  }, [shops, searchResults, selectedBrands, sortBy, userLocation]);
+
+  // Precompute distances for display
+  const shopDistances = useMemo(() => {
+    if (!userLocation) return null;
+    const distances: Record<number, number> = {};
+    for (const shop of filteredShops) {
+      distances[shop.id] = haversineDistance(userLocation, { lat: shop.latitude, lng: shop.longitude });
+    }
+    return distances;
+  }, [filteredShops, userLocation]);
 
   // Toggle brand selection
   const handleBrandToggle = (brandId: number) => {
@@ -245,12 +272,47 @@ export default function HomePage() {
 
         setHighlightedShopId(null);
         setRouletteState('idle');
-        setSelectedShop(winner); // This triggers map flyTo in Map component
+        setRouletteWinner(winner);
       }
     }, intervalTime);
 
     return () => clearInterval(intervalId);
   }, [filteredShops, mapBounds]);
+
+  // Share roulette result as image
+  const handleShareRoulette = useCallback(async (shop: Shop) => {
+    try {
+      const blob = await generateShareCard(shop);
+      const file = new File([blob], 'boba-pick.png', { type: 'image/png' });
+
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          title: `${shop.name} - Boba Seeker Pick`,
+          text: 'Boba Seeker picked this shop for me!',
+          files: [file],
+        });
+      } else {
+        // Desktop fallback: download the image
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'boba-pick.png';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      // User cancelled share or error - ignore
+      console.error('Share failed:', err);
+    }
+  }, []);
+
+  // Dismiss roulette result and show shop detail
+  const handleRouletteViewShop = useCallback(() => {
+    if (rouletteWinner) {
+      setSelectedShop(rouletteWinner);
+    }
+    setRouletteWinner(null);
+  }, [rouletteWinner]);
 
   // Listen for URL param ?action=explore
   useEffect(() => {
@@ -283,6 +345,10 @@ export default function HomePage() {
             ? filteredShops.find(s => s.id === highlightedShopId)?.name
             : undefined
         }
+        winner={rouletteWinner}
+        onShare={handleShareRoulette}
+        onDismiss={handleRouletteViewShop}
+        onClose={() => setRouletteWinner(null)}
       />
 
       {/* Full-screen Map */}
@@ -326,6 +392,10 @@ export default function HomePage() {
         isSearchActive={searchResults !== null}
         isFavorite={isFavorite}
         onToggleFavorite={toggleFavorite}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        userLocation={userLocation}
+        shopDistances={shopDistances}
       />
     </div>
   );
